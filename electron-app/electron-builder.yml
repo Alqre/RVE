@@ -4,19 +4,24 @@ directories:
   output: release
   buildResources: build-resources
 
+# esbuild (utilisé par @remotion/bundler à chaque export) et les autres outils qui
+# spawnent leur propre binaire natif ne fonctionnent pas correctement une fois
+# packés dans l'archive virtuelle app.asar (résolution de chemin cassée -> crash
+# "service is no longer running" à l'export). Le plus simple et le plus robuste
+# est de ne pas utiliser asar du tout pour cette appli.
+asar: false
+
 files:
   - out/**/*
   - package.json
 
-# remotion-template et assets/ vivent hors de electron-app/ (monorepo en npm workspaces).
-# On les copie tels quels dans resources/ : @remotion/bundler rebundle le projet à chaque
-# export (voir render.ts), il lui faut donc les sources + les dépendances Node réelles,
-# pas seulement un bundle figé. Comme node_modules est hissé à la racine du workspace,
-# on le copie aussi pour préserver la résolution de modules (remotion-template/src/*
-# retrouve node_modules en remontant, exactement comme en dev).
+# remotion-template et node_modules sont le "moteur" : on les copie dans resources/
+# (extraResources) au moment du packaging. @remotion/bundler rebundle le projet à
+# chaque export (voir render.ts), il lui faut donc les sources + les dépendances Node
+# réelles, pas seulement un bundle figé. Comme node_modules est hissé à la racine du
+# workspace, on le copie aussi pour préserver la résolution de modules
+# (remotion-template/src/* retrouve node_modules en remontant, comme en dev).
 extraResources:
-  - from: ../assets
-    to: assets
   - from: ../remotion-template
     to: remotion-template
     filter:
@@ -27,9 +32,13 @@ extraResources:
   - from: ../node_modules
     to: node_modules
 
-asarUnpack:
-  - resources/node_modules/@remotion/**
-  - resources/node_modules/@napi-rs/**
+# assets/ est la bibliothèque de contenu éditable par l'utilisateur final (logos,
+# killers, maps, bracket...). Contrairement à ce qui précède, elle doit rester à côté
+# du .exe (extraFiles, pas extraResources) pour que l'utilisateur puisse y ajouter ou
+# remplacer des fichiers après installation sans jamais avoir à reconstruire l'appli.
+extraFiles:
+  - from: ../assets
+    to: assets
 
 win:
   target: nsis

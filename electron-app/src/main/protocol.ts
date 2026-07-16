@@ -47,7 +47,7 @@ export function handleAssetProtocol(): void {
     try {
       const data = await fs.promises.readFile(pathname);
       const mime = MIME_TYPES[path.extname(pathname).toLowerCase()] ?? 'application/octet-stream';
-      return new Response(data, {headers: {'Content-Type': mime}});
+      return new Response(data, {headers: {'Content-Type': mime, 'Cache-Control': 'no-store'}});
     } catch {
       return new Response(null, {status: 404});
     }

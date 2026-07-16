@@ -3,7 +3,7 @@ import path from 'node:path';
 import {ASSETS_DIR, SELECTED_ASSETS_DIR} from './paths';
 import {toAssetUrl} from './protocol';
 
-export type SlotType = 'image' | 'video' | 'text';
+export type SlotType = 'image' | 'video' | 'text' | 'select';
 
 export interface ManifestSlot {
   id: string;
@@ -11,6 +11,12 @@ export interface ManifestSlot {
   label: string;
   propPath: string;
   folder?: string;
+  /** Pour un slot image/video : id d'un slot texte à auto-remplir avec le nom du fichier choisi. */
+  linkedTextSlot?: string;
+  /** Pour un slot 'select' : les valeurs proposées. */
+  options?: string[];
+  /** Pour les slots liés à une manche (killer/map) : numéro de manche, utilisé pour le filtrage selon le format BO3/BO5/BO7. */
+  gameNumber?: number;
 }
 
 interface ManifestFile {
@@ -52,18 +58,30 @@ function listFilesForSlot(slot: ManifestSlot): AssetFile[] {
 }
 
 function currentFileForSlot(slot: ManifestSlot): string | null {
-  if (slot.type === 'text' || !fs.existsSync(SELECTED_ASSETS_DIR)) return null;
+  if (slot.type !== 'image' && slot.type !== 'video') return null;
+  if (!fs.existsSync(SELECTED_ASSETS_DIR)) return null;
   const match = fs.readdirSync(SELECTED_ASSETS_DIR).find((f) => path.parse(f).name === slot.id);
   return match ?? null;
 }
 
 export function listSlots(): SlotWithFiles[] {
   const manifest = readManifest();
-  return manifest.slots.map((slot) => ({
-    ...slot,
-    files: listFilesForSlot(slot),
-    currentFile: currentFileForSlot(slot),
-  }));
+  return manifest.slots.map((slot) => {
+    const files = listFilesForSlot(slot);
+
+    // Si un seul fichier est disponible pour ce slot (ex: image de bracket remplacée en
+    // externe par l'utilisateur), on le (re)copie automatiquement à chaque démarrage :
+    // pas besoin de le resélectionner à la main après l'avoir remplacé sur le disque.
+    if ((slot.type === 'image' || slot.type === 'video') && files.length === 1) {
+      selectFileForSlot(slot.id, files[0].path);
+    }
+
+    return {
+      ...slot,
+      files,
+      currentFile: currentFileForSlot(slot),
+    };
+  });
 }
 
 /**

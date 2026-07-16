@@ -2,39 +2,32 @@ import React from 'react';
 import {AbsoluteFill, Img, interpolate, useCurrentFrame, staticFile} from 'remotion';
 import type {MainSceneProps} from '../schema';
 
-const Row: React.FC<{logoSrc: string; teamName: string; delay: number; frame: number}> = ({logoSrc, teamName, delay, frame}) => {
-	const scale = interpolate(frame, [delay, delay + 15], [0.6, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
-	const opacity = interpolate(frame, [delay, delay + 15], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
-
-	return (
-		<div
-			style={{
-				display: 'flex',
-				alignItems: 'center',
-				gap: 24,
-				backgroundColor: '#1b1b24',
-				padding: '16px 32px',
-				borderRadius: 12,
-				transform: `scale(${scale})`,
-				opacity,
-			}}
-		>
-			{logoSrc ? <Img src={staticFile(logoSrc)} style={{width: 56, height: 56, objectFit: 'contain'}} /> : null}
-			<span style={{color: 'white', fontSize: 32, fontFamily: 'sans-serif'}}>{teamName}</span>
-		</div>
-	);
-};
-
-export const Bracket: React.FC<MainSceneProps> = ({teamA, teamB, roundLabel}) => {
+export const Bracket: React.FC<MainSceneProps> = ({bracketImageSrc}) => {
 	const frame = useCurrentFrame();
+	const opacity = interpolate(frame, [0, 15], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
 
 	return (
-		<AbsoluteFill style={{backgroundColor: '#0e0e14', justifyContent: 'center', alignItems: 'center', gap: 32}}>
-			<div style={{color: '#e6b800', fontSize: 28, fontFamily: 'sans-serif', marginBottom: 24}}>{roundLabel} — Bracket</div>
-			<div style={{display: 'flex', flexDirection: 'column', gap: 20}}>
-				<Row logoSrc={teamA.logoSrc} teamName={teamA.teamName} delay={5} frame={frame} />
-				<Row logoSrc={teamB.logoSrc} teamName={teamB.teamName} delay={20} frame={frame} />
-			</div>
+		<AbsoluteFill style={{backgroundColor: '#0e0e14', justifyContent: 'center', alignItems: 'center', opacity}}>
+			{bracketImageSrc ? (
+				<Img src={staticFile(bracketImageSrc)} style={{width: '100%', height: '100%', objectFit: 'contain'}} />
+			) : (
+				<div
+					style={{
+						width: '80%',
+						height: '80%',
+						border: '3px dashed #444',
+						borderRadius: 16,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						color: '#666',
+						fontSize: 28,
+						fontFamily: 'sans-serif',
+					}}
+				>
+					Image du bracket ici
+				</div>
+			)}
 		</AbsoluteFill>
 	);
 };

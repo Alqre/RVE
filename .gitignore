@@ -5,11 +5,14 @@ package-lock.json
 remotion-template/out/
 remotion-template/build/
 remotion-template/.remotion/
+# Cache de la sélection courante (copié depuis assets/ à chaque choix utilisateur, pas du contenu source)
+remotion-template/public/selected/*
+!remotion-template/public/selected/.gitkeep
 
 # Electron
 electron-app/out/
 electron-app/dist/
-electron-app/release/
+electron-app/release*/
 
 # Exports produits par l'appli
 output/

@@ -1,9 +1,11 @@
 import {app, BrowserWindow} from 'electron';
 import path from 'node:path';
 import {registerAssetProtocolScheme, handleAssetProtocol} from './protocol';
+import {registerAppProtocolScheme, handleAppProtocol, APP_URL} from './appProtocol';
 import {registerIpcHandlers} from './ipc';
 
 registerAssetProtocolScheme();
+registerAppProtocolScheme();
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -21,12 +23,13 @@ function createWindow(): void {
   if (process.env.ELECTRON_RENDERER_URL) {
     win.loadURL(process.env.ELECTRON_RENDERER_URL);
   } else {
-    win.loadFile(path.join(__dirname, '../renderer/index.html'));
+    win.loadURL(APP_URL);
   }
 }
 
 app.whenReady().then(() => {
   handleAssetProtocol();
+  handleAppProtocol(path.join(__dirname, '../renderer'));
   registerIpcHandlers();
   createWindow();
 
