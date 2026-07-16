@@ -1,0 +1,15 @@
+node_modules/
+package-lock.json
+
+# Remotion
+remotion-template/out/
+remotion-template/build/
+remotion-template/.remotion/
+
+# Electron
+electron-app/out/
+electron-app/dist/
+electron-app/release/
+
+# Exports produits par l'appli
+output/

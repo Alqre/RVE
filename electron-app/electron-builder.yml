@@ -1,0 +1,40 @@
+appId: com.tournoi.exportscene
+productName: Export Scene Stream
+directories:
+  output: release
+  buildResources: build-resources
+
+files:
+  - out/**/*
+  - package.json
+
+# remotion-template et assets/ vivent hors de electron-app/ (monorepo en npm workspaces).
+# On les copie tels quels dans resources/ : @remotion/bundler rebundle le projet à chaque
+# export (voir render.ts), il lui faut donc les sources + les dépendances Node réelles,
+# pas seulement un bundle figé. Comme node_modules est hissé à la racine du workspace,
+# on le copie aussi pour préserver la résolution de modules (remotion-template/src/*
+# retrouve node_modules en remontant, exactement comme en dev).
+extraResources:
+  - from: ../assets
+    to: assets
+  - from: ../remotion-template
+    to: remotion-template
+    filter:
+      - '**/*'
+      - '!node_modules'
+      - '!out'
+      - '!build'
+  - from: ../node_modules
+    to: node_modules
+
+asarUnpack:
+  - resources/node_modules/@remotion/**
+  - resources/node_modules/@napi-rs/**
+
+win:
+  target: nsis
+  artifactName: '${productName}-Setup-${version}.${ext}'
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

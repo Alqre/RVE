@@ -1,0 +1,8 @@
+{
+  "name": "projet-app-revival",
+  "private": true,
+  "workspaces": [
+    "remotion-template",
+    "electron-app"
+  ]
+}

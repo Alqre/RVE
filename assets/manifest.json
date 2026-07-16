@@ -1,0 +1,43 @@
+{
+  "slots": [
+    {
+      "id": "teamALogo",
+      "type": "image",
+      "folder": "logos",
+      "label": "Logo Équipe A",
+      "propPath": "teamA.logoSrc"
+    },
+    {
+      "id": "teamAName",
+      "type": "text",
+      "label": "Nom Équipe A",
+      "propPath": "teamA.teamName"
+    },
+    {
+      "id": "teamBLogo",
+      "type": "image",
+      "folder": "logos",
+      "label": "Logo Équipe B",
+      "propPath": "teamB.logoSrc"
+    },
+    {
+      "id": "teamBName",
+      "type": "text",
+      "label": "Nom Équipe B",
+      "propPath": "teamB.teamName"
+    },
+    {
+      "id": "roundLabel",
+      "type": "text",
+      "label": "Round / Manche",
+      "propPath": "roundLabel"
+    },
+    {
+      "id": "clipInsert",
+      "type": "video",
+      "folder": "clips",
+      "label": "Clip vidéo (section Planning)",
+      "propPath": "clipInsertSrc"
+    }
+  ]
+}
