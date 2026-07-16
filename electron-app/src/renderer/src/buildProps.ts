@@ -4,7 +4,6 @@ import {GAMES_BY_FORMAT, type MatchFormat} from '../../../../remotion-template/s
 export type SlotValues = Record<string, string>;
 
 export const DEFAULT_TEXT_VALUES: SlotValues = {
-  roundLabel: 'Demi-finale',
   matchFormat: 'BO3',
 };
 

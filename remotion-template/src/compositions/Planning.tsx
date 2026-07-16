@@ -39,17 +39,22 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 	const activeGames = allGames.slice(0, activeCount);
 
 	return (
-		<AbsoluteFill style={{backgroundColor: '#0e0e14', justifyContent: 'center', alignItems: 'center'}}>
-			<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32}}>
-				<span style={{color: 'white', fontSize: 28, fontFamily: 'sans-serif'}}>
-					Planning — {roundLabel} ({matchFormat})
-				</span>
-				<div style={{display: 'flex', gap: 28}}>
-					{activeGames.map((game, index) => (
-						<GameColumn key={index} game={game} index={index} frame={frame} />
-					))}
+		<AbsoluteFill>
+			<AbsoluteFill>
+				<Img src={staticFile('video_file_remotion/global_bg.png')} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+			</AbsoluteFill>
+			<AbsoluteFill style={{justifyContent: 'center', alignItems: 'center'}}>
+				<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32}}>
+					<span style={{color: 'white', fontSize: 28, fontFamily: 'sans-serif'}}>
+						Planning — {roundLabel || '—'} ({matchFormat})
+					</span>
+					<div style={{display: 'flex', gap: 28}}>
+						{activeGames.map((game, index) => (
+							<GameColumn key={index} game={game} index={index} frame={frame} />
+						))}
+					</div>
 				</div>
-			</div>
+			</AbsoluteFill>
 		</AbsoluteFill>
 	);
 };

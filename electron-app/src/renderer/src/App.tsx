@@ -11,6 +11,7 @@ function sectionStartLabel(slot: SlotWithFiles): string | null {
   if (slot.id === 'casterAImage') return 'Casters';
   if (slot.gameNumber !== undefined && slot.id === `killerGame${slot.gameNumber}`) return `Manche ${slot.gameNumber}`;
   if (slot.id === 'bracketImage') return 'Bracket';
+  if (slot.id === 'schedulePeriod') return 'Planning — Période';
   if (slot.id === 'match1Team1') return 'Planning — Match 1';
   if (slot.id === 'match2Team1') return 'Planning — Match 2';
   if (slot.id === 'match3Team1') return 'Planning — Match 3';

@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, Img, interpolate, useCurrentFrame, staticFile} from 'remotion';
+import {AbsoluteFill, Img, OffthreadVideo, interpolate, useCurrentFrame, staticFile} from 'remotion';
 import type {MainSceneProps, UpcomingMatch} from '../schema';
 
 const TeamTag: React.FC<{logoSrc: string; name: string}> = ({logoSrc, name}) => (
@@ -41,20 +41,33 @@ const MatchRow: React.FC<{match: UpcomingMatch; delay: number; frame: number}> =
 	);
 };
 
-export const Schedule: React.FC<MainSceneProps> = ({match1, match2, match3}) => {
+export const Schedule: React.FC<MainSceneProps> = ({match1, match2, match3, schedulePeriod}) => {
 	const frame = useCurrentFrame();
 	const matches = [match1, match2, match3];
 
 	return (
-		<AbsoluteFill style={{backgroundColor: '#0e0e14', justifyContent: 'center', alignItems: 'center'}}>
-			<div style={{display: 'flex', flexDirection: 'column', gap: 32, width: 1200}}>
-				<span style={{color: 'white', fontSize: 28, fontFamily: 'sans-serif', textAlign: 'center'}}>
-					Prochains matchs
-				</span>
-				{matches.map((match, index) => (
-					<MatchRow key={index} match={match} delay={index * 8} frame={frame} />
-				))}
-			</div>
+		<AbsoluteFill>
+			<AbsoluteFill style={{zIndex: 0}}>
+				<Img src={staticFile('video_file_remotion/global_bg.png')} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+			</AbsoluteFill>
+			<AbsoluteFill style={{zIndex: 1, justifyContent: 'center', alignItems: 'center'}}>
+				<div style={{display: 'flex', flexDirection: 'column', gap: 32, width: 1200}}>
+					<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8}}>
+						<span style={{color: 'white', fontSize: 28, fontFamily: 'sans-serif', textAlign: 'center'}}>
+							Prochains matchs
+						</span>
+						<span style={{color: '#e6b800', fontSize: 20, fontFamily: 'sans-serif', textAlign: 'center'}}>
+							{schedulePeriod || '—'}
+						</span>
+					</div>
+					{matches.map((match, index) => (
+						<MatchRow key={index} match={match} delay={index * 8} frame={frame} />
+					))}
+				</div>
+			</AbsoluteFill>
+			<AbsoluteFill style={{zIndex: 2}}>
+				<OffthreadVideo src={staticFile('video_file_remotion/scene3.webm')} loop style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+			</AbsoluteFill>
 		</AbsoluteFill>
 	);
 };

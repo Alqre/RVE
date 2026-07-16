@@ -294,6 +294,12 @@
       "gameNumber": 7
     },
     {
+      "id": "schedulePeriod",
+      "type": "text",
+      "label": "Planning — Période",
+      "propPath": "schedulePeriod"
+    },
+    {
       "id": "match1Team1",
       "type": "image",
       "folder": "logos",
