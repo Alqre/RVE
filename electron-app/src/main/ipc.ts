@@ -1,6 +1,6 @@
 import {ipcMain, shell, BrowserWindow} from 'electron';
 import {listSlots, selectFileForSlot} from './assets';
-import {exportVideo} from './render';
+import {exportVideo, type ExportFormat} from './render';
 import {ASSETS_DIR} from './paths';
 
 export function registerIpcHandlers(): void {
@@ -12,9 +12,9 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('assets:openFolder', () => shell.openPath(ASSETS_DIR));
 
-  ipcMain.handle('export:start', async (event, inputProps: Record<string, unknown>) => {
+  ipcMain.handle('export:start', async (event, inputProps: Record<string, unknown>, format: ExportFormat) => {
     const win = BrowserWindow.fromWebContents(event.sender);
-    const outputPath = await exportVideo(inputProps, (progress) => {
+    const outputPath = await exportVideo(inputProps, format, (progress) => {
       event.sender.send('export:progress', progress);
     });
     if (win) shell.showItemInFolder(outputPath);

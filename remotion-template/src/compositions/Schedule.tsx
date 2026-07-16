@@ -35,7 +35,7 @@ const MatchRow: React.FC<{match: UpcomingMatch; delay: number; frame: number}> =
 			<span style={{color: '#e6b800', fontSize: 22, fontFamily: 'sans-serif'}}>VS</span>
 			<TeamTag logoSrc={match.team2LogoSrc} name={match.team2Name} />
 			<span style={{color: '#ccc', fontSize: 20, fontFamily: 'sans-serif', width: 200, textAlign: 'right'}}>
-				{match.date || 'Date à venir'}
+				{match.date || 'Date TBD'}
 			</span>
 		</div>
 	);
@@ -54,7 +54,7 @@ export const Schedule: React.FC<MainSceneProps> = ({match1, match2, match3, sche
 				<div style={{display: 'flex', flexDirection: 'column', gap: 32, width: 1200}}>
 					<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8}}>
 						<span style={{color: 'white', fontSize: 28, fontFamily: 'sans-serif', textAlign: 'center'}}>
-							Prochains matchs
+							Upcoming Matches
 						</span>
 						<span style={{color: '#e6b800', fontSize: 20, fontFamily: 'sans-serif', textAlign: 'center'}}>
 							{schedulePeriod || '—'}
@@ -66,7 +66,7 @@ export const Schedule: React.FC<MainSceneProps> = ({match1, match2, match3, sche
 				</div>
 			</AbsoluteFill>
 			<AbsoluteFill style={{zIndex: 2}}>
-				<OffthreadVideo src={staticFile('video_file_remotion/scene3.webm')} loop style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+				<OffthreadVideo transparent src={staticFile('video_file_remotion/scene3.webm')} loop style={{width: '100%', height: '100%', objectFit: 'cover'}} />
 			</AbsoluteFill>
 		</AbsoluteFill>
 	);

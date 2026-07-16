@@ -14,7 +14,7 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
   const sortedFiles = useMemo(
     () =>
       [...slot.files].sort((a, b) =>
-        deriveNameFromFile(a.name).localeCompare(deriveNameFromFile(b.name), 'fr', {sensitivity: 'base'}),
+        deriveNameFromFile(a.name).localeCompare(deriveNameFromFile(b.name), 'en', {sensitivity: 'base'}),
       ),
     [slot.files],
   );
@@ -57,7 +57,7 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
       <div className="slot">
         <label className="slot-label">{slot.label}</label>
         <p className="slot-empty">
-          Aucun fichier dans <code>assets/{slot.folder}</code>. Ajoutez-en un puis relancez l'appli.
+          No files in <code>assets/{slot.folder}</code>. Add one and restart the app.
         </p>
       </div>
     );
@@ -73,7 +73,7 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
           if (e.target.value) onPickFile(slot.id, e.target.value);
         }}
       >
-        <option value="">— Choisir —</option>
+        <option value="">— Choose —</option>
         {sortedFiles.map((file) => (
           <option key={file.path} value={file.path}>
             {deriveNameFromFile(file.name)}

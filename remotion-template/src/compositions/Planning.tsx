@@ -13,7 +13,7 @@ const GameColumn: React.FC<{game: GameSlot; index: number; frame: number}> = ({g
 
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, opacity, width: 160}}>
-			<span style={{color: '#e6b800', fontSize: 20, fontFamily: 'sans-serif'}}>Manche {index + 1}</span>
+			<span style={{color: '#e6b800', fontSize: 20, fontFamily: 'sans-serif'}}>Game {index + 1}</span>
 			{game.killerSrc ? (
 				<Img src={staticFile(game.killerSrc)} style={{width: 120, height: 120, objectFit: 'contain'}} />
 			) : (
@@ -46,7 +46,7 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 			<AbsoluteFill style={{justifyContent: 'center', alignItems: 'center'}}>
 				<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32}}>
 					<span style={{color: 'white', fontSize: 28, fontFamily: 'sans-serif'}}>
-						Planning — {roundLabel || '—'} ({matchFormat})
+						Line-up — {roundLabel || '—'} ({matchFormat})
 					</span>
 					<div style={{display: 'flex', gap: 28}}>
 						{activeGames.map((game, index) => (

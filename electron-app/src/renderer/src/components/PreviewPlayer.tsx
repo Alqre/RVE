@@ -1,5 +1,5 @@
-import React from 'react';
-import {Player} from '@remotion/player';
+import React, {forwardRef} from 'react';
+import {Player, type PlayerRef} from '@remotion/player';
 import {MainScene, SUB_SCENE_DURATION, SUB_SCENE_COUNT} from '../../../../../remotion-template/src/compositions/MainScene';
 import type {MainSceneProps} from '../../../../../remotion-template/src/schema';
 
@@ -7,9 +7,10 @@ interface Props {
   inputProps: MainSceneProps;
 }
 
-export const PreviewPlayer: React.FC<Props> = ({inputProps}) => {
+export const PreviewPlayer = forwardRef<PlayerRef, Props>(({inputProps}, ref) => {
   return (
     <Player
+      ref={ref}
       component={MainScene}
       inputProps={inputProps}
       durationInFrames={SUB_SCENE_DURATION * SUB_SCENE_COUNT}
@@ -21,4 +22,6 @@ export const PreviewPlayer: React.FC<Props> = ({inputProps}) => {
       loop
     />
   );
-};
+});
+
+PreviewPlayer.displayName = 'PreviewPlayer';

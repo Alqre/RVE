@@ -1,20 +1,24 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import type {PlayerRef} from '@remotion/player';
 import type {SlotWithFiles} from '../../main/assets';
 import type {MainSceneProps} from '../../../../remotion-template/src/schema';
+import type {ExportFormat} from '../../main/render';
 import {SlotPicker} from './components/SlotPicker';
 import {PreviewPlayer} from './components/PreviewPlayer';
 import {buildInputProps, deriveNameFromFile, initialValues, isSlotVisible, type SlotValues} from './buildProps';
 
+const EXPORT_FORMATS: ExportFormat[] = ['mp4', 'webm'];
+
 function sectionStartLabel(slot: SlotWithFiles): string | null {
-  if (slot.id === 'matchFormat') return 'Format du match';
-  if (slot.id === 'teamALogo') return 'Équipes';
+  if (slot.id === 'matchFormat') return 'Match Format';
+  if (slot.id === 'teamALogo') return 'Teams';
   if (slot.id === 'casterAImage') return 'Casters';
-  if (slot.gameNumber !== undefined && slot.id === `killerGame${slot.gameNumber}`) return `Manche ${slot.gameNumber}`;
+  if (slot.gameNumber !== undefined && slot.id === `killerGame${slot.gameNumber}`) return `Game ${slot.gameNumber}`;
   if (slot.id === 'bracketImage') return 'Bracket';
-  if (slot.id === 'schedulePeriod') return 'Planning — Période';
-  if (slot.id === 'match1Team1') return 'Planning — Match 1';
-  if (slot.id === 'match2Team1') return 'Planning — Match 2';
-  if (slot.id === 'match3Team1') return 'Planning — Match 3';
+  if (slot.id === 'schedulePeriod') return 'Schedule — Period';
+  if (slot.id === 'match1Team1') return 'Schedule — Match 1';
+  if (slot.id === 'match2Team1') return 'Schedule — Match 2';
+  if (slot.id === 'match3Team1') return 'Schedule — Match 3';
   return null;
 }
 
@@ -23,10 +27,23 @@ export const App: React.FC = () => {
   const [values, setValues] = useState<SlotValues>({});
   const [selectedSource, setSelectedSource] = useState<SlotValues>({});
   const [previewNonce, setPreviewNonce] = useState(0);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('mp4');
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [resultPath, setResultPath] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const playerRef = useRef<PlayerRef | null>(null);
+  const pendingFrameRef = useRef<number | null>(null);
+
+  // Le Player est remonté (voir previewNonce) à chaque sélection d'asset pour forcer le
+  // rechargement du fichier depuis le disque. Sans ça, la lecture reviendrait à la frame 0
+  // à chaque sélection : on restaure donc la position juste après le remontage.
+  useEffect(() => {
+    if (pendingFrameRef.current !== null) {
+      playerRef.current?.seekTo(pendingFrameRef.current);
+      pendingFrameRef.current = null;
+    }
+  }, [previewNonce]);
 
   useEffect(() => {
     window.api.listSlots().then((loaded) => {
@@ -81,6 +98,7 @@ export const App: React.FC = () => {
     // toujours "teamALogo.png"), donc la prop peut rester identique même si le contenu a
     // changé : on force un remontage complet du Player pour être sûr que l'aperçu recharge
     // bien la nouvelle image depuis le disque plutôt que de garder l'ancienne à l'écran.
+    pendingFrameRef.current = playerRef.current?.getCurrentFrame() ?? null;
     setPreviewNonce((n) => n + 1);
   };
 
@@ -95,7 +113,7 @@ export const App: React.FC = () => {
     setResultPath(null);
     setError(null);
     try {
-      const outputPath = await window.api.startExport(inputProps);
+      const outputPath = await window.api.startExport(inputProps, exportFormat);
       setResultPath(outputPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -105,15 +123,15 @@ export const App: React.FC = () => {
   };
 
   if (!slots || !inputProps) {
-    return <div className="app-loading">Chargement des emplacements…</div>;
+    return <div className="app-loading">Loading slots…</div>;
   }
 
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Export de la scène de stream</h1>
+        <h1>Stream Scene Export</h1>
         <button className="link-button" onClick={() => window.api.openAssetsFolder()}>
-          Ouvrir le dossier des assets
+          Open assets folder
         </button>
       </header>
 
@@ -137,10 +155,23 @@ export const App: React.FC = () => {
         </div>
 
         <div className="preview-panel">
-          <PreviewPlayer key={previewNonce} inputProps={inputProps} />
+          <PreviewPlayer key={previewNonce} inputProps={inputProps} ref={playerRef} />
+
+          <div className="slot-options export-format-options">
+            {EXPORT_FORMATS.map((format) => (
+              <button
+                key={format}
+                className={`slot-option ${exportFormat === format ? 'slot-option-selected' : ''}`}
+                onClick={() => setExportFormat(format)}
+                disabled={exporting}
+              >
+                .{format}
+              </button>
+            ))}
+          </div>
 
           <button className="export-button" onClick={handleExport} disabled={exporting}>
-            {exporting ? `Export en cours… ${Math.round(progress * 100)}%` : 'Exporter en .mp4'}
+            {exporting ? `Exporting… ${Math.round(progress * 100)}%` : `Export to .${exportFormat}`}
           </button>
 
           {exporting && (
@@ -149,8 +180,8 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {resultPath && <p className="export-success">Export terminé : {resultPath}</p>}
-          {error && <p className="export-error">Erreur pendant l'export : {error}</p>}
+          {resultPath && <p className="export-success">Export complete: {resultPath}</p>}
+          {error && <p className="export-error">Error during export: {error}</p>}
         </div>
       </div>
     </div>

@@ -30,7 +30,7 @@ export const Bracket: React.FC<MainSceneProps> = ({ bracketImageSrc }) => {
 							fontFamily: 'sans-serif',
 						}}
 					>
-						Image du bracket ici
+						Bracket image goes here
 					</div>
 				)}
 			</AbsoluteFill>

@@ -3,7 +3,7 @@
     {
       "id": "matchFormat",
       "type": "select",
-      "label": "Format du match",
+      "label": "Match Format",
       "propPath": "matchFormat",
       "options": ["BO3", "BO5", "BO7"]
     },
@@ -11,34 +11,34 @@
       "id": "teamALogo",
       "type": "image",
       "folder": "logos",
-      "label": "Logo Équipe A",
+      "label": "Team A Logo",
       "propPath": "teamA.logoSrc",
       "linkedTextSlot": "teamAName"
     },
     {
       "id": "teamAName",
       "type": "text",
-      "label": "Nom Équipe A",
+      "label": "Team A Name",
       "propPath": "teamA.teamName"
     },
     {
       "id": "teamBLogo",
       "type": "image",
       "folder": "logos",
-      "label": "Logo Équipe B",
+      "label": "Team B Logo",
       "propPath": "teamB.logoSrc",
       "linkedTextSlot": "teamBName"
     },
     {
       "id": "teamBName",
       "type": "text",
-      "label": "Nom Équipe B",
+      "label": "Team B Name",
       "propPath": "teamB.teamName"
     },
     {
       "id": "roundLabel",
       "type": "text",
-      "label": "Round / Manche",
+      "label": "Round",
       "propPath": "roundLabel"
     },
     {
@@ -52,7 +52,7 @@
     {
       "id": "casterAName",
       "type": "text",
-      "label": "Nom Caster 1",
+      "label": "Caster 1 Name",
       "propPath": "casterA.name"
     },
     {
@@ -66,14 +66,14 @@
     {
       "id": "casterBName",
       "type": "text",
-      "label": "Nom Caster 2",
+      "label": "Caster 2 Name",
       "propPath": "casterB.name"
     },
     {
       "id": "killerGame1",
       "type": "image",
       "folder": "killers",
-      "label": "Killer - Manche 1",
+      "label": "Killer - Game 1",
       "propPath": "game1.killerSrc",
       "linkedTextSlot": "killerGame1Name",
       "gameNumber": 1
@@ -81,7 +81,7 @@
     {
       "id": "killerGame1Name",
       "type": "text",
-      "label": "Nom Killer - Manche 1",
+      "label": "Killer Name - Game 1",
       "propPath": "game1.killerName",
       "gameNumber": 1
     },
@@ -89,7 +89,7 @@
       "id": "mapGame1",
       "type": "image",
       "folder": "maps",
-      "label": "Map - Manche 1",
+      "label": "Map - Game 1",
       "propPath": "game1.mapSrc",
       "linkedTextSlot": "mapGame1Name",
       "gameNumber": 1
@@ -97,7 +97,7 @@
     {
       "id": "mapGame1Name",
       "type": "text",
-      "label": "Nom Map - Manche 1",
+      "label": "Map Name - Game 1",
       "propPath": "game1.mapName",
       "gameNumber": 1
     },
@@ -105,7 +105,7 @@
       "id": "killerGame2",
       "type": "image",
       "folder": "killers",
-      "label": "Killer - Manche 2",
+      "label": "Killer - Game 2",
       "propPath": "game2.killerSrc",
       "linkedTextSlot": "killerGame2Name",
       "gameNumber": 2
@@ -113,7 +113,7 @@
     {
       "id": "killerGame2Name",
       "type": "text",
-      "label": "Nom Killer - Manche 2",
+      "label": "Killer Name - Game 2",
       "propPath": "game2.killerName",
       "gameNumber": 2
     },
@@ -121,7 +121,7 @@
       "id": "mapGame2",
       "type": "image",
       "folder": "maps",
-      "label": "Map - Manche 2",
+      "label": "Map - Game 2",
       "propPath": "game2.mapSrc",
       "linkedTextSlot": "mapGame2Name",
       "gameNumber": 2
@@ -129,7 +129,7 @@
     {
       "id": "mapGame2Name",
       "type": "text",
-      "label": "Nom Map - Manche 2",
+      "label": "Map Name - Game 2",
       "propPath": "game2.mapName",
       "gameNumber": 2
     },
@@ -137,7 +137,7 @@
       "id": "killerGame3",
       "type": "image",
       "folder": "killers",
-      "label": "Killer - Manche 3",
+      "label": "Killer - Game 3",
       "propPath": "game3.killerSrc",
       "linkedTextSlot": "killerGame3Name",
       "gameNumber": 3
@@ -145,7 +145,7 @@
     {
       "id": "killerGame3Name",
       "type": "text",
-      "label": "Nom Killer - Manche 3",
+      "label": "Killer Name - Game 3",
       "propPath": "game3.killerName",
       "gameNumber": 3
     },
@@ -153,7 +153,7 @@
       "id": "mapGame3",
       "type": "image",
       "folder": "maps",
-      "label": "Map - Manche 3",
+      "label": "Map - Game 3",
       "propPath": "game3.mapSrc",
       "linkedTextSlot": "mapGame3Name",
       "gameNumber": 3
@@ -161,7 +161,7 @@
     {
       "id": "mapGame3Name",
       "type": "text",
-      "label": "Nom Map - Manche 3",
+      "label": "Map Name - Game 3",
       "propPath": "game3.mapName",
       "gameNumber": 3
     },
@@ -169,7 +169,7 @@
       "id": "killerGame4",
       "type": "image",
       "folder": "killers",
-      "label": "Killer - Manche 4",
+      "label": "Killer - Game 4",
       "propPath": "game4.killerSrc",
       "linkedTextSlot": "killerGame4Name",
       "gameNumber": 4
@@ -177,7 +177,7 @@
     {
       "id": "killerGame4Name",
       "type": "text",
-      "label": "Nom Killer - Manche 4",
+      "label": "Killer Name - Game 4",
       "propPath": "game4.killerName",
       "gameNumber": 4
     },
@@ -185,7 +185,7 @@
       "id": "mapGame4",
       "type": "image",
       "folder": "maps",
-      "label": "Map - Manche 4",
+      "label": "Map - Game 4",
       "propPath": "game4.mapSrc",
       "linkedTextSlot": "mapGame4Name",
       "gameNumber": 4
@@ -193,7 +193,7 @@
     {
       "id": "mapGame4Name",
       "type": "text",
-      "label": "Nom Map - Manche 4",
+      "label": "Map Name - Game 4",
       "propPath": "game4.mapName",
       "gameNumber": 4
     },
@@ -201,7 +201,7 @@
       "id": "killerGame5",
       "type": "image",
       "folder": "killers",
-      "label": "Killer - Manche 5",
+      "label": "Killer - Game 5",
       "propPath": "game5.killerSrc",
       "linkedTextSlot": "killerGame5Name",
       "gameNumber": 5
@@ -209,7 +209,7 @@
     {
       "id": "killerGame5Name",
       "type": "text",
-      "label": "Nom Killer - Manche 5",
+      "label": "Killer Name - Game 5",
       "propPath": "game5.killerName",
       "gameNumber": 5
     },
@@ -217,7 +217,7 @@
       "id": "mapGame5",
       "type": "image",
       "folder": "maps",
-      "label": "Map - Manche 5",
+      "label": "Map - Game 5",
       "propPath": "game5.mapSrc",
       "linkedTextSlot": "mapGame5Name",
       "gameNumber": 5
@@ -225,7 +225,7 @@
     {
       "id": "mapGame5Name",
       "type": "text",
-      "label": "Nom Map - Manche 5",
+      "label": "Map Name - Game 5",
       "propPath": "game5.mapName",
       "gameNumber": 5
     },
@@ -233,7 +233,7 @@
       "id": "killerGame6",
       "type": "image",
       "folder": "killers",
-      "label": "Killer - Manche 6",
+      "label": "Killer - Game 6",
       "propPath": "game6.killerSrc",
       "linkedTextSlot": "killerGame6Name",
       "gameNumber": 6
@@ -241,7 +241,7 @@
     {
       "id": "killerGame6Name",
       "type": "text",
-      "label": "Nom Killer - Manche 6",
+      "label": "Killer Name - Game 6",
       "propPath": "game6.killerName",
       "gameNumber": 6
     },
@@ -249,7 +249,7 @@
       "id": "mapGame6",
       "type": "image",
       "folder": "maps",
-      "label": "Map - Manche 6",
+      "label": "Map - Game 6",
       "propPath": "game6.mapSrc",
       "linkedTextSlot": "mapGame6Name",
       "gameNumber": 6
@@ -257,7 +257,7 @@
     {
       "id": "mapGame6Name",
       "type": "text",
-      "label": "Nom Map - Manche 6",
+      "label": "Map Name - Game 6",
       "propPath": "game6.mapName",
       "gameNumber": 6
     },
@@ -265,7 +265,7 @@
       "id": "killerGame7",
       "type": "image",
       "folder": "killers",
-      "label": "Killer - Manche 7",
+      "label": "Killer - Game 7",
       "propPath": "game7.killerSrc",
       "linkedTextSlot": "killerGame7Name",
       "gameNumber": 7
@@ -273,7 +273,7 @@
     {
       "id": "killerGame7Name",
       "type": "text",
-      "label": "Nom Killer - Manche 7",
+      "label": "Killer Name - Game 7",
       "propPath": "game7.killerName",
       "gameNumber": 7
     },
@@ -281,7 +281,7 @@
       "id": "mapGame7",
       "type": "image",
       "folder": "maps",
-      "label": "Map - Manche 7",
+      "label": "Map - Game 7",
       "propPath": "game7.mapSrc",
       "linkedTextSlot": "mapGame7Name",
       "gameNumber": 7
@@ -289,42 +289,42 @@
     {
       "id": "mapGame7Name",
       "type": "text",
-      "label": "Nom Map - Manche 7",
+      "label": "Map Name - Game 7",
       "propPath": "game7.mapName",
       "gameNumber": 7
     },
     {
       "id": "schedulePeriod",
       "type": "text",
-      "label": "Planning — Période",
+      "label": "Schedule — Period",
       "propPath": "schedulePeriod"
     },
     {
       "id": "match1Team1",
       "type": "image",
       "folder": "logos",
-      "label": "Match 1 — Équipe 1",
+      "label": "Match 1 — Team 1",
       "propPath": "match1.team1LogoSrc",
       "linkedTextSlot": "match1Team1Name"
     },
     {
       "id": "match1Team1Name",
       "type": "text",
-      "label": "Match 1 — Nom Équipe 1",
+      "label": "Match 1 — Team 1 Name",
       "propPath": "match1.team1Name"
     },
     {
       "id": "match1Team2",
       "type": "image",
       "folder": "logos",
-      "label": "Match 1 — Équipe 2",
+      "label": "Match 1 — Team 2",
       "propPath": "match1.team2LogoSrc",
       "linkedTextSlot": "match1Team2Name"
     },
     {
       "id": "match1Team2Name",
       "type": "text",
-      "label": "Match 1 — Nom Équipe 2",
+      "label": "Match 1 — Team 2 Name",
       "propPath": "match1.team2Name"
     },
     {
@@ -337,28 +337,28 @@
       "id": "match2Team1",
       "type": "image",
       "folder": "logos",
-      "label": "Match 2 — Équipe 1",
+      "label": "Match 2 — Team 1",
       "propPath": "match2.team1LogoSrc",
       "linkedTextSlot": "match2Team1Name"
     },
     {
       "id": "match2Team1Name",
       "type": "text",
-      "label": "Match 2 — Nom Équipe 1",
+      "label": "Match 2 — Team 1 Name",
       "propPath": "match2.team1Name"
     },
     {
       "id": "match2Team2",
       "type": "image",
       "folder": "logos",
-      "label": "Match 2 — Équipe 2",
+      "label": "Match 2 — Team 2",
       "propPath": "match2.team2LogoSrc",
       "linkedTextSlot": "match2Team2Name"
     },
     {
       "id": "match2Team2Name",
       "type": "text",
-      "label": "Match 2 — Nom Équipe 2",
+      "label": "Match 2 — Team 2 Name",
       "propPath": "match2.team2Name"
     },
     {
@@ -371,28 +371,28 @@
       "id": "match3Team1",
       "type": "image",
       "folder": "logos",
-      "label": "Match 3 — Équipe 1",
+      "label": "Match 3 — Team 1",
       "propPath": "match3.team1LogoSrc",
       "linkedTextSlot": "match3Team1Name"
     },
     {
       "id": "match3Team1Name",
       "type": "text",
-      "label": "Match 3 — Nom Équipe 1",
+      "label": "Match 3 — Team 1 Name",
       "propPath": "match3.team1Name"
     },
     {
       "id": "match3Team2",
       "type": "image",
       "folder": "logos",
-      "label": "Match 3 — Équipe 2",
+      "label": "Match 3 — Team 2",
       "propPath": "match3.team2LogoSrc",
       "linkedTextSlot": "match3Team2Name"
     },
     {
       "id": "match3Team2Name",
       "type": "text",
-      "label": "Match 3 — Nom Équipe 2",
+      "label": "Match 3 — Team 2 Name",
       "propPath": "match3.team2Name"
     },
     {
@@ -405,7 +405,7 @@
       "id": "bracketImage",
       "type": "image",
       "folder": "bracket",
-      "label": "Image du bracket",
+      "label": "Bracket Image",
       "propPath": "bracketImageSrc"
     }
   ]

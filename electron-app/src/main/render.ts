@@ -6,6 +6,8 @@ import {REMOTION_DIR, OUTPUT_DIR} from './paths';
 
 const COMPOSITION_ID = 'MainScene';
 
+export type ExportFormat = 'mp4' | 'webm';
+
 /**
  * On rebundle à chaque export (quelques secondes) plutôt que de réutiliser un bundle
  * pré-construit : le bundle capture un instantané de public/selected au moment du
@@ -18,6 +20,7 @@ async function getServeUrl(): Promise<string> {
 
 export async function exportVideo(
   inputProps: Record<string, unknown>,
+  format: ExportFormat,
   onProgress: (progress: number) => void,
 ): Promise<string> {
   const serveUrl = await getServeUrl();
@@ -29,12 +32,12 @@ export async function exportVideo(
   });
 
   fs.mkdirSync(OUTPUT_DIR, {recursive: true});
-  const outputPath = path.join(OUTPUT_DIR, `export-${Date.now()}.mp4`);
+  const outputPath = path.join(OUTPUT_DIR, `export-${Date.now()}.${format}`);
 
   await renderMedia({
     composition,
     serveUrl,
-    codec: 'h264',
+    codec: format === 'webm' ? 'vp9' : 'h264',
     pixelFormat: 'yuv420p',
     outputLocation: outputPath,
     inputProps,

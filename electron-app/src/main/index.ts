@@ -11,7 +11,7 @@ function createWindow(): void {
   const win = new BrowserWindow({
     width: 1360,
     height: 900,
-    title: 'Export scène de stream',
+    title: 'Stream Scene Export',
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
