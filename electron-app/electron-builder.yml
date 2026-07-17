@@ -1,7 +1,7 @@
 appId: com.tournoi.exportscene
 productName: Export Scene Stream
 directories:
-  output: release
+  output: release-clean
   buildResources: build-resources
 
 # esbuild (utilisé par @remotion/bundler à chaque export) et les autres outils qui

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "release": "electron-vite build && electron-builder --dir",
     "dist:win": "electron-vite build && electron-builder --win"
   },
   "dependencies": {

@@ -42,6 +42,43 @@ export async function exportVideo(
     outputLocation: outputPath,
     inputProps,
     onProgress: ({progress}) => onProgress(progress),
+    // Chaque frame est piquée vers ffmpeg en JPEG avant l'encodage final ; passer
+    // sa qualité au maximum réduit la perte de qualité (légers artefacts de
+    // contraste/teinte) qui s'accumule avec la compression du codec final.
+    jpegQuality: 100,
+    /**
+     * Remotion pipe les frames vers ffmpeg en JPEG (JPEG utilise toujours la
+     * pleine plage 0-255), ce qui fait sortir l'encodage vidéo en "full range"
+     * (yuvj420p / color_range=pc). La plupart des lecteurs/outils broadcast
+     * (VLC, OBS, Twitch...) attendent la plage limitée standard (16-235) pour du
+     * H.264/VP9 classique et n'honorent pas toujours ce tag correctement, ce qui
+     * donnait un rendu bien plus contrasté qu'à l'écran une fois exporté.
+     *
+     * (Forcer aussi la matrice en bt709 a été testé pour un souci de teinte
+     * rouge->orange séparé, mais n'a rien changé au rendu réel : la cause de ce
+     * souci-là est ailleurs, donc on ne garde que le fix de plage ici.)
+     *
+     * L'étape qui fait l'encodage réel varie selon le codec : pour le H.264 c'est
+     * la phase 'pre-stitcher' (la phase 'stitcher' ne fait que copier/muxer avec
+     * l'audio via -c:v copy, sans réencoder) ; pour le VP9/webm il n'y a qu'une
+     * seule phase 'stitcher' qui fait l'encodage ET le muxage en une fois. On
+     * détecte donc la bonne étape en cherchant un vrai encodeur vidéo dans -c:v
+     * plutôt qu'en se fiant au nom de la phase.
+     */
+    ffmpegOverride: ({args}) => {
+      const codecIndex = args.indexOf('-c:v');
+      const videoCodec = codecIndex !== -1 ? args[codecIndex + 1] : null;
+      if (videoCodec !== 'libx264' && videoCodec !== 'libvpx-vp9') return args;
+      const outputIndex = args.length - 1;
+      return [
+        ...args.slice(0, outputIndex),
+        '-vf',
+        'scale=in_range=full:out_range=limited',
+        '-color_range',
+        'tv',
+        ...args.slice(outputIndex),
+      ];
+    },
   });
 
   return outputPath;
