@@ -1,72 +1,130 @@
 import React from 'react';
-import {AbsoluteFill, Img, OffthreadVideo, interpolate, useCurrentFrame, staticFile} from 'remotion';
-import type {MainSceneProps, UpcomingMatch} from '../schema';
+import { AbsoluteFill, Easing, Img, interpolate, useCurrentFrame, staticFile } from 'remotion';
+import type { MainSceneProps, UpcomingMatch } from '../schema';
 
-const TeamTag: React.FC<{logoSrc: string; name: string}> = ({logoSrc, name}) => (
-	<div style={{display: 'flex', alignItems: 'center', gap: 12, width: 260}}>
-		{logoSrc ? (
-			<Img src={staticFile(logoSrc)} style={{width: 48, height: 48, objectFit: 'contain'}} />
-		) : (
-			<div style={{width: 48, height: 48, border: '2px dashed #444', borderRadius: 8}} />
-		)}
-		<span style={{color: 'white', fontSize: 24, fontFamily: 'sans-serif'}}>{name || '—'}</span>
-	</div>
-);
+const WEEKDAYS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+const MONTHS = [
+	'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
+	'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
+];
 
-const MatchRow: React.FC<{match: UpcomingMatch; delay: number; frame: number}> = ({match, delay, frame}) => {
-	const opacity = interpolate(frame, [delay, delay + 15], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
-	const x = interpolate(frame, [delay, delay + 15], [-40, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+/** "2026-07-20T19:30" (valeur d'un <input type="datetime-local">) -> "MONDAY 20 JULY / 19:30 CET". */
+function formatMatchDateTime(value: string): string {
+	const date = value ? new Date(value) : null;
+	if (!date || Number.isNaN(date.getTime())) return 'Date TBD';
+	const weekday = WEEKDAYS[date.getDay()];
+	const day = date.getDate();
+	const month = MONTHS[date.getMonth()];
+	const hours = String(date.getHours()).padStart(2, '0');
+	const minutes = String(date.getMinutes()).padStart(2, '0');
+	return `${weekday} ${day} ${month} / ${hours}:${minutes} CET`;
+}
+
+/** Utilisé aussi bien pour formater que pour trier/griser : on ne parse la date qu'une fois. */
+function parseMatchDate(value: string): Date | null {
+	if (!value) return null;
+	const date = new Date(value);
+	return Number.isNaN(date.getTime()) ? null : date;
+}
+
+const MatchRow: React.FC<{ match: UpcomingMatch; delay: number; frame: number; isPast: boolean }> = ({
+	match,
+	delay,
+	frame,
+	isPast,
+}) => {
+	const opacity = interpolate(frame, [delay + 60, delay + 90], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.ease), });
+	const x = interpolate(frame, [delay + 60, delay + 90], [-80, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: Easing.inOut(Easing.ease), });
 
 	return (
-		<div
-			style={{
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'space-between',
-				gap: 40,
-				backgroundColor: '#1b1b24',
-				padding: '20px 32px',
-				borderRadius: 12,
-				opacity,
-				transform: `translateX(${x}px)`,
-			}}
-		>
-			<TeamTag logoSrc={match.team1LogoSrc} name={match.team1Name} />
-			<span style={{color: '#e6b800', fontSize: 22, fontFamily: 'sans-serif'}}>VS</span>
-			<TeamTag logoSrc={match.team2LogoSrc} name={match.team2Name} />
-			<span style={{color: '#ccc', fontSize: 20, fontFamily: 'sans-serif', width: 200, textAlign: 'right'}}>
-				{match.date || 'Date TBD'}
-			</span>
+		<div style={{ opacity: isPast ? opacity * 0.5 : opacity, transform: `translateX(${x}px)` }}>
+			<div style={{ textAlign: 'center', color: isPast ? '#666' : '#e7e3db', fontSize: 24, fontFamily: 'roboto', fontWeight: 300 }}>
+				{formatMatchDateTime(match.date)}
+			</div>
+			<div
+				style={{
+					textAlign: 'center',
+					whiteSpace: 'nowrap',
+					fontSize: 80,
+					fontFamily: 'bebas kai',
+					textTransform: 'uppercase',
+					color: isPast ? '#6b6b73' : '#e7e3db',
+				}}
+			>
+				{match.team1Name || '—'} <span style={{ color: '#eb3636' }}>VS</span> {match.team2Name || '—'}
+			</div>
 		</div>
 	);
 };
 
-export const Schedule: React.FC<MainSceneProps> = ({match1, match2, match3, schedulePeriod}) => {
+export const Schedule: React.FC<MainSceneProps> = ({ teamA, teamB, match1, match2, match3, schedulePeriod, tournamentName }) => {
 	const frame = useCurrentFrame();
-	const matches = [match1, match2, match3];
+
+	// Les matchs déjà passés (comparés à l'instant du rendu) descendent en bas de la
+	// liste et restent groupés/triés parmi eux ; ceux sans date renseignée sont
+	// considérés comme à venir (on ne peut pas savoir s'ils sont passés).
+	const now = Date.now();
+	const orderedMatches = [match1, match2, match3]
+		.map((match) => {
+			const parsed = parseMatchDate(match.date);
+			return { match, isPast: parsed !== null && parsed.getTime() < now, sortKey: parsed?.getTime() ?? Infinity };
+		})
+		.sort((a, b) => {
+			if (a.isPast !== b.isPast) return a.isPast ? 1 : -1;
+			return a.sortKey - b.sortKey;
+		});
+
+	const opacity_1 = interpolate(frame, [25, 60], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+		easing: Easing.inOut(Easing.ease),
+	});
+	const opacity_2 = interpolate(frame, [0, 35], [0, 1], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+		easing: Easing.inOut(Easing.ease),
+	});
+	const leftpos_1 = interpolate(frame, [0, 80], [-600, -250], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+		easing: Easing.inOut(Easing.ease),
+	});
+	const leftpos_2 = interpolate(frame, [0, 60], [-300, 160], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+		easing: Easing.inOut(Easing.ease),
+	});
+	const opacity_out = interpolate(frame, [420, 450], [1, 0], {
+		extrapolateLeft: 'clamp',
+		extrapolateRight: 'clamp',
+		easing: Easing.inOut(Easing.ease),
+	});
 
 	return (
 		<AbsoluteFill>
-			<AbsoluteFill style={{zIndex: 0}}>
-				<Img src={staticFile('video_file_remotion/global_bg.png')} style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+			<AbsoluteFill style={{ zIndex: 0 }}>
+				<Img src={staticFile('video_file_remotion/global_bg.png')} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 			</AbsoluteFill>
-			<AbsoluteFill style={{zIndex: 1, justifyContent: 'center', alignItems: 'center'}}>
-				<div style={{display: 'flex', flexDirection: 'column', gap: 32, width: 1200}}>
-					<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8}}>
-						<span style={{color: 'white', fontSize: 28, fontFamily: 'sans-serif', textAlign: 'center'}}>
-							Upcoming Matches
-						</span>
-						<span style={{color: '#e6b800', fontSize: 20, fontFamily: 'sans-serif', textAlign: 'center'}}>
-							{schedulePeriod || '—'}
-						</span>
-					</div>
-					{matches.map((match, index) => (
-						<MatchRow key={index} match={match} delay={index * 8} frame={frame} />
-					))}
+			<AbsoluteFill style={{ zIndex: 1, opacity: opacity_out }}>
+				<div style={{ display: 'flex', flexDirection: 'column', gap: 48, width: 800, position: 'absolute', top: 500, right: 51 }}>
+					{orderedMatches.map(({ match, isPast }, index) => (
+						<MatchRow key={index} match={match} delay={index * 20} frame={frame} isPast={isPast} />
+					))}</div>
+				<div style={{ display: 'flex', flexDirection: 'column', position: 'absolute', top: 165, right: 250, width: 400, height: 100, backgroundColor: '#e7e3db', opacity: opacity_2 }}>
+					<p style={{ marginTop: 8, textAlign: 'center', color: '#121212', fontFamily: 'bebas kai', fontSize: 28, opacity: 1 }}>{tournamentName || '—'}</p>
+					<p style={{ marginTop: -33, textAlign: 'center', color: '#121212', fontFamily: 'bebas kai', fontSize: 50, opacity: 1 }}>{schedulePeriod || '—'}</p>
+				</div >
+				<div style={{ display: 'flex', flexDirection: 'column', position: 'absolute', top: 240, right: 51, width: 800, opacity: opacity_1 }}>
+					<p style={{ textAlign: 'center', color: '#eb3636', fontFamily: 'bebas kai', fontSize: 50, opacity: 1 }}>CURRENT MATCH</p>
+					<div style={{ textAlign: 'center', marginTop: -54 }}>
+						<span style={{ padding: 10, paddingLeft: 25, paddingRight: 25, backgroundColor: '#eb3636', color: '#e7e3db', fontFamily: 'bebas kai', fontSize: 80, opacity: 1 }}>{teamA.teamName || '—'} <span style={{ color: '#121212' }}>VS</span> {teamB.teamName || '—'}</span>
+					</div >
 				</div>
+
 			</AbsoluteFill>
-			<AbsoluteFill style={{zIndex: 2}}>
-				<OffthreadVideo transparent src={staticFile('video_file_remotion/scene3.webm')} loop style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+			<AbsoluteFill style={{ zIndex: 2, flexDirection: 'row', opacity: opacity_out }}>
+				<Img src={staticFile('video_file_remotion/Legion.png')} style={{ width: '57%', position: 'absolute', left: leftpos_1, opacity: opacity_1 }} />
+				<Img src={staticFile('video_file_remotion/Pyramid.png')} style={{ width: '57%', position: 'absolute', left: leftpos_2, opacity: opacity_2 }} />
 			</AbsoluteFill>
 		</AbsoluteFill>
 	);

@@ -10,7 +10,7 @@ export const DEFAULT_TEXT_VALUES: SlotValues = {
 export function initialValues(slots: SlotWithFiles[]): SlotValues {
   const values: SlotValues = {};
   for (const slot of slots) {
-    if (slot.type === 'text' || slot.type === 'select') {
+    if (slot.type === 'text' || slot.type === 'select' || slot.type === 'datetime') {
       values[slot.id] = DEFAULT_TEXT_VALUES[slot.id] ?? slot.options?.[0] ?? '';
     } else if (slot.files.length === 1) {
       // Un seul fichier possible (ex: bracket) : auto-sélectionné côté main process,

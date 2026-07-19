@@ -1,8 +1,10 @@
-import {app, BrowserWindow} from 'electron';
+import {app, BrowserWindow, Menu} from 'electron';
 import path from 'node:path';
 import {registerAssetProtocolScheme, handleAssetProtocol} from './protocol';
 import {registerAppProtocolScheme, handleAppProtocol, APP_URL} from './appProtocol';
 import {registerIpcHandlers} from './ipc';
+
+Menu.setApplicationMenu(null);
 
 registerAssetProtocolScheme();
 registerAppProtocolScheme();
@@ -11,7 +13,7 @@ function createWindow(): void {
   const win = new BrowserWindow({
     width: 1360,
     height: 900,
-    title: 'Stream Scene Export',
+    title: 'Revival Video Exporter',
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,

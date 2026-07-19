@@ -1,6 +1,12 @@
 {
   "slots": [
     {
+      "id": "tournamentName",
+      "type": "text",
+      "label": "Tournament Name",
+      "propPath": "tournamentName"
+    },
+    {
       "id": "matchFormat",
       "type": "select",
       "label": "Match Format",
@@ -329,7 +335,7 @@
     },
     {
       "id": "match1Date",
-      "type": "text",
+      "type": "datetime",
       "label": "Match 1 — Date",
       "propPath": "match1.date"
     },
@@ -363,7 +369,7 @@
     },
     {
       "id": "match2Date",
-      "type": "text",
+      "type": "datetime",
       "label": "Match 2 — Date",
       "propPath": "match2.date"
     },
@@ -397,7 +403,7 @@
     },
     {
       "id": "match3Date",
-      "type": "text",
+      "type": "datetime",
       "label": "Match 3 — Date",
       "propPath": "match3.date"
     },

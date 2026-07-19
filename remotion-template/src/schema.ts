@@ -55,6 +55,7 @@ const emptyMatch: z.infer<typeof upcomingMatchSchema> = {
 };
 
 export const mainSceneSchema = z.object({
+  tournamentName: z.string(),
   teamA: teamSlotSchema,
   teamB: teamSlotSchema,
   roundLabel: z.string(),
@@ -82,6 +83,7 @@ export type UpcomingMatch = z.infer<typeof upcomingMatchSchema>;
 export type MainSceneProps = z.infer<typeof mainSceneSchema>;
 
 export const defaultMainSceneProps: MainSceneProps = {
+  tournamentName: '',
   teamA: {
     logoSrc: '',
     teamName: '',

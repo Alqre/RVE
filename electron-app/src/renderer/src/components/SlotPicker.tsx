@@ -33,6 +33,20 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
     );
   }
 
+  if (slot.type === 'datetime') {
+    return (
+      <div className="slot">
+        <label className="slot-label">{slot.label}</label>
+        <input
+          className="slot-text-input"
+          type="datetime-local"
+          value={value}
+          onChange={(e) => onTextChange(slot.id, e.target.value)}
+        />
+      </div>
+    );
+  }
+
   if (slot.type === 'select') {
     return (
       <div className="slot">

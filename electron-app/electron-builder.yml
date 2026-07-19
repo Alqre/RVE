@@ -1,5 +1,5 @@
 appId: com.tournoi.exportscene
-productName: Export Scene Stream
+productName: Revival Video Exporter
 directories:
   output: release-clean
   buildResources: build-resources

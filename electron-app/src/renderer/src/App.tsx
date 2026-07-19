@@ -10,6 +10,7 @@ import {buildInputProps, deriveNameFromFile, initialValues, isSlotVisible, type 
 const EXPORT_FORMATS: ExportFormat[] = ['mp4', 'webm'];
 
 function sectionStartLabel(slot: SlotWithFiles): string | null {
+  if (slot.id === 'tournamentName') return 'Tournament';
   if (slot.id === 'matchFormat') return 'Match Format';
   if (slot.id === 'teamALogo') return 'Teams';
   if (slot.id === 'casterAImage') return 'Casters';
@@ -129,7 +130,12 @@ export const App: React.FC = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Stream Scene Export</h1>
+        <div className="app-header-titles">
+          <h1>Revival Video Exporter</h1>
+          <p className="app-subtitle">
+            Made by <span className="app-subtitle-highlight">Pikz</span>
+          </p>
+        </div>
         <button className="link-button" onClick={() => window.api.openAssetsFolder()}>
           Open assets folder
         </button>

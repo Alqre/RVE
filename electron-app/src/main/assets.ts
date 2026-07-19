@@ -3,7 +3,7 @@ import path from 'node:path';
 import {ASSETS_DIR, SELECTED_ASSETS_DIR} from './paths';
 import {toAssetUrl} from './protocol';
 
-export type SlotType = 'image' | 'video' | 'text' | 'select';
+export type SlotType = 'image' | 'video' | 'text' | 'select' | 'datetime';
 
 export interface ManifestSlot {
   id: string;

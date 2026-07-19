@@ -37,6 +37,7 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 	const allGames = [game1, game2, game3, game4, game5, game6, game7];
 	const activeCount = GAMES_BY_FORMAT[matchFormat] ?? GAMES_BY_FORMAT.BO3;
 	const activeGames = allGames.slice(0, activeCount);
+	const fadeInOpacity = interpolate(frame, [0, 30, 570, 600], [1, 0, 0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
 	return (
 		<AbsoluteFill>
@@ -55,6 +56,7 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 					</div>
 				</div>
 			</AbsoluteFill>
+			<AbsoluteFill style={{ zIndex: 3, backgroundColor: '#000', opacity: fadeInOpacity }} />
 		</AbsoluteFill>
 	);
 };
