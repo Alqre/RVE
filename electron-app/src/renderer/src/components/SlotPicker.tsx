@@ -8,9 +8,10 @@ interface Props {
   selectedSourcePath?: string;
   onPickFile: (slotId: string, sourcePath: string) => void;
   onTextChange: (slotId: string, value: string) => void;
+  onClear: (slotId: string) => void;
 }
 
-export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, onPickFile, onTextChange}) => {
+export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, onPickFile, onTextChange, onClear}) => {
   const sortedFiles = useMemo(
     () =>
       [...slot.files].sort((a, b) =>
@@ -27,6 +28,7 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
           className="slot-text-input"
           type="text"
           value={value}
+          placeholder={slot.placeholder}
           onChange={(e) => onTextChange(slot.id, e.target.value)}
         />
       </div>
@@ -81,15 +83,16 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
     <div className="slot">
       <label className="slot-label">{slot.label}</label>
       <select
-        className="slot-select"
+        className={`slot-select ${!selectedSourcePath ? 'slot-select-empty' : ''}`}
         value={selectedSourcePath ?? ''}
         onChange={(e) => {
           if (e.target.value) onPickFile(slot.id, e.target.value);
+          else onClear(slot.id);
         }}
       >
-        <option value="">— Choose —</option>
+        <option value="" style={{color: '#5c5c66'}}>Empty</option>
         {sortedFiles.map((file) => (
-          <option key={file.path} value={file.path}>
+          <option key={file.path} value={file.path} style={{color: '#f0f0f2'}}>
             {deriveNameFromFile(file.name)}
           </option>
         ))}

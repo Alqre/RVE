@@ -18,6 +18,15 @@ async function getServeUrl(): Promise<string> {
   return bundle({entryPoint: path.join(REMOTION_DIR, 'src', 'index.ts')});
 }
 
+/** ex: "19072026_2120" (DDMMYYYY_HHmm, heure locale au moment de l'export). */
+function timestampForFilename(): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const date = `${pad(now.getDate())}${pad(now.getMonth() + 1)}${now.getFullYear()}`;
+  const time = `${pad(now.getHours())}${pad(now.getMinutes())}`;
+  return `${date}_${time}`;
+}
+
 export async function exportVideo(
   inputProps: Record<string, unknown>,
   format: ExportFormat,
@@ -32,7 +41,7 @@ export async function exportVideo(
   });
 
   fs.mkdirSync(OUTPUT_DIR, {recursive: true});
-  const outputPath = path.join(OUTPUT_DIR, `export-${Date.now()}.${format}`);
+  const outputPath = path.join(OUTPUT_DIR, `export_${timestampForFilename()}.${format}`);
 
   await renderMedia({
     composition,

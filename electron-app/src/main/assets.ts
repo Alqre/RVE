@@ -11,6 +11,8 @@ export interface ManifestSlot {
   label: string;
   propPath: string;
   folder?: string;
+  /** Pour un slot texte : exemple affiché en placeholder tant que le champ est vide. */
+  placeholder?: string;
   /** Pour un slot image/video : id d'un slot texte à auto-remplir avec le nom du fichier choisi. */
   linkedTextSlot?: string;
   /** Pour un slot 'select' : les valeurs proposées. */

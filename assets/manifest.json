@@ -4,7 +4,8 @@
       "id": "tournamentName",
       "type": "text",
       "label": "Tournament Name",
-      "propPath": "tournamentName"
+      "propPath": "tournamentName",
+      "placeholder": "Ex. Invitational Tournament, Season 1..."
     },
     {
       "id": "matchFormat",
@@ -45,7 +46,8 @@
       "id": "roundLabel",
       "type": "text",
       "label": "Round",
-      "propPath": "roundLabel"
+      "propPath": "roundLabel",
+      "placeholder": "Ex. Grand Final, Round 1..."
     },
     {
       "id": "casterAImage",
@@ -303,7 +305,8 @@
       "id": "schedulePeriod",
       "type": "text",
       "label": "Schedule — Period",
-      "propPath": "schedulePeriod"
+      "propPath": "schedulePeriod",
+      "placeholder": "Ex. Schedule - Week 3"
     },
     {
       "id": "match1Team1",

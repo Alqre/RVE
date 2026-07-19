@@ -9,11 +9,18 @@ Menu.setApplicationMenu(null);
 registerAssetProtocolScheme();
 registerAppProtocolScheme();
 
+// En dev, l'icône vient du dossier source ; une fois packagée, electron-builder la
+// copie dans resources/ (voir extraResources dans electron-builder.yml).
+const iconPath = app.isPackaged
+  ? path.join(process.resourcesPath, 'icon.png')
+  : path.join(__dirname, '../../build-resources/icon.png');
+
 function createWindow(): void {
   const win = new BrowserWindow({
     width: 1360,
     height: 900,
     title: 'Revival Video Exporter',
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,

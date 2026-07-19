@@ -31,6 +31,11 @@ extraResources:
       - '!build'
   - from: ../node_modules
     to: node_modules
+  # icon.png sert de fichier disponible à l'exécution pour l'icône de fenêtre
+  # (voir main/index.ts) ; l'icône du .exe/installeur est générée à part par
+  # electron-builder à partir de build-resources/icon.png (convention par défaut).
+  - from: build-resources/icon.png
+    to: icon.png
 
 # assets/ est la bibliothèque de contenu éditable par l'utilisateur final (logos,
 # killers, maps, bracket...). Contrairement à ce qui précède, elle doit rester à côté

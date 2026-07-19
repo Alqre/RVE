@@ -9,6 +9,9 @@ body {
   color: #f0f0f2;
   scrollbar-color: #3a3a45 #1c1c22;
   scrollbar-width: thin;
+  /* Fait rendre les contrôles natifs (case à cocher, etc.) dans leur variante sombre
+     par défaut du navigateur, plutôt que la case blanche habituelle. */
+  color-scheme: dark;
 }
 
 ::-webkit-scrollbar {
@@ -71,6 +74,11 @@ body {
   font-weight: 600;
 }
 
+.app-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .link-button {
   background: none;
   border: 1px solid #444;
@@ -82,6 +90,20 @@ body {
 
 .link-button:hover {
   border-color: #888;
+}
+
+.discord-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #5865f2;
+  border-color: #5865f2;
+  color: #fff;
+}
+
+.discord-button:hover {
+  background: #4752c4;
+  border-color: #4752c4;
 }
 
 .app-body {
@@ -148,6 +170,11 @@ body {
   color: #f0f0f2;
 }
 
+.slots-panel > .slot-section-title:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
 .slot-options {
   display: flex;
   gap: 8px;
@@ -183,6 +210,51 @@ body {
   font-size: 15px;
 }
 
+.slot-select-empty {
+  color: #5c5c66;
+}
+
+.fill-status {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.fill-status-warning {
+  color: #f5a524;
+}
+
+.fill-status-ok {
+  color: #6fdc8c;
+}
+
+.export-option-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.export-option-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.export-option-toggle:hover {
+  color: #f0f0f2;
+}
+
+.export-option-toggle input {
+  width: 15px;
+  height: 15px;
+  accent-color: #fe2d2d;
+  cursor: pointer;
+}
+
 .export-button {
   background: #fe2d2d;
   color: #17171d;
@@ -192,6 +264,11 @@ body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.export-button:not(:disabled):hover {
+  background: #ff5555;
 }
 
 .export-button:disabled {
