@@ -5,7 +5,7 @@ import type { MainSceneProps } from '../schema';
 export const Bracket: React.FC<MainSceneProps> = ({ bracketImageSrc }) => {
 	const frame = useCurrentFrame();
 	const opacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-	const fadeInOpacity = interpolate(frame, [420, 450], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+	const fadeInOpacity = interpolate(frame, [570, 600], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 	const leftpos = interpolate(frame, [0, 30], [-100, 0], {
 			extrapolateLeft: 'clamp',
 			extrapolateRight: 'clamp',

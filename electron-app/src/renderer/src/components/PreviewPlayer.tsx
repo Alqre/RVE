@@ -1,6 +1,6 @@
 import React, {forwardRef} from 'react';
 import {Player, type PlayerRef} from '@remotion/player';
-import {MainScene, TOTAL_DURATION} from '../../../../../remotion-template/src/compositions/MainScene';
+import {MainScene, getTotalDuration} from '../../../../../remotion-template/src/compositions/MainScene';
 import type {MainSceneProps} from '../../../../../remotion-template/src/schema';
 
 interface Props {
@@ -13,7 +13,7 @@ export const PreviewPlayer = forwardRef<PlayerRef, Props>(({inputProps}, ref) =>
       ref={ref}
       component={MainScene}
       inputProps={inputProps}
-      durationInFrames={TOTAL_DURATION}
+      durationInFrames={getTotalDuration(inputProps.matchFormat)}
       fps={30}
       compositionWidth={1920}
       compositionHeight={1080}

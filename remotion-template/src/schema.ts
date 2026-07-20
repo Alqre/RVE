@@ -31,6 +31,22 @@ export const GAMES_BY_FORMAT: Record<MatchFormat, number> = {
   BO7: 7,
 };
 
+/**
+ * Durée (en frames @30fps) de la sous-scène Planning selon le format : plus de games
+ * à montrer en carrousel pour BO5/BO7 (voir Planning.tsx) demande plus de temps.
+ * Défini ici (pas dans MainScene.tsx) pour que MainScene.tsx et Planning.tsx puissent
+ * tous les deux l'importer sans dépendance circulaire entre les deux fichiers.
+ */
+export const PLANNING_DURATION_BY_FORMAT: Record<MatchFormat, number> = {
+  BO3: 600, // 20s @ 30fps
+  BO5: 900, // 30s @ 30fps
+  BO7: 1200, // 40s @ 30fps
+};
+
+export function getPlanningDuration(matchFormat: MatchFormat): number {
+  return PLANNING_DURATION_BY_FORMAT[matchFormat] ?? PLANNING_DURATION_BY_FORMAT.BO3;
+}
+
 export const upcomingMatchSchema = z.object({
   team1LogoSrc: z.string(),
   team1Name: z.string(),

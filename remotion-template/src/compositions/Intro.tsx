@@ -2,12 +2,35 @@ import React from 'react';
 import { AbsoluteFill, Easing, Img, OffthreadVideo, interpolate, spring, useCurrentFrame, useVideoConfig, staticFile } from 'remotion';
 import type { MainSceneProps } from '../schema';
 
-const Logo: React.FC<{ src: string }> = ({ src }) =>
-	src ? (
-		<Img src={staticFile(src)} style={{ width: 205, height: 205, objectFit: 'contain' }} />
+// Glow léger propre à certaines équipes (couleur demandée par équipe), appliqué via
+// drop-shadow (suit la silhouette du logo, contrairement à box-shadow qui suivrait le
+// cadre rectangulaire du PNG transparent).
+const TEAM_GLOW_COLORS: Record<string, string> = {
+	sinners: 'rgba(168, 85, 247, 0.35)',
+	elysium: 'rgba(59, 130, 246, 0.55)',
+	oboy: 'rgba(235, 54, 54, 0.55)',
+};
+
+// Toute équipe sans couleur dédiée reçoit une ombre noire légère par défaut, plutôt
+// que pas de glow du tout.
+const DEFAULT_GLOW_COLOR = 'rgba(0, 0, 0, 0.55)';
+
+const Logo: React.FC<{ src: string; teamName?: string }> = ({ src, teamName }) => {
+	const glowColor = (teamName && TEAM_GLOW_COLORS[teamName.trim().toLowerCase()]) || DEFAULT_GLOW_COLOR;
+	return src ? (
+		<Img
+			src={staticFile(src)}
+			style={{
+				width: 205,
+				height: 205,
+				objectFit: 'contain',
+				filter: `drop-shadow(0 0 12px ${glowColor})`,
+			}}
+		/>
 	) : (
 		<div style={{ width: 205, height: 205, border: '3px dashed #444', borderRadius: 16 }} />
 	);
+};
 
 const CasterTag: React.FC<{ imageSrc: string; name: string }> = ({ imageSrc, name }) => (
 	imageSrc ? (
@@ -41,15 +64,15 @@ export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, cast
 			</AbsoluteFill>
 			<AbsoluteFill style={{ zIndex: 1 }}>
 				<div style={{ position: 'absolute', bottom: bottompos, right: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5, opacity: logoOpacity }}>
-					<Logo src={teamA.logoSrc} />
+					<Logo src={teamA.logoSrc} teamName={teamA.teamName} />
 					<span style={{ fontSize: 32, color: '#eb3636', fontFamily: 'bebas kai', opacity: textOpacity }}>{teamA.teamName || '—'}</span>
 				</div>
-				<div style={{ position: 'absolute', bottom: bottompos, right: 84, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5, opacity: logoOpacity }}>
-					<Logo src={teamB.logoSrc} style={{ opacity: labelOpacity }} />
+				<div style={{ position: 'absolute', bottom: bottompos, right: 83, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5, opacity: logoOpacity }}>
+					<Logo src={teamB.logoSrc} teamName={teamB.teamName} />
 					<span style={{ fontSize: 32, color: '#eb3636', fontFamily: 'bebas kai', opacity: textOpacity }}>{teamB.teamName || '—'}</span>
 				</div>
 				<div style={{ position: 'absolute', bottom: 405, right: 200, left: 1450, opacity: labelOpacity }}>
-					<div style={{ color: '#e7e3db', fontSize: 20, fontFamily: 'roboto', textAlign: 'center' }}>
+					<div style={{ color: '#e7e3db', fontSize: 26, fontFamily: 'bebas kai', textAlign: 'center' }}>
 						{roundLabel || '—'}</div>
 				</div>
 				<div style={{ position: 'absolute', bottom: 69, left: 122.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5 }}>

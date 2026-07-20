@@ -1,12 +1,26 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {bundle} from '@remotion/bundler';
-import {renderMedia, selectComposition} from '@remotion/renderer';
+import {renderMedia, selectComposition, makeCancelSignal} from '@remotion/renderer';
 import {REMOTION_DIR, OUTPUT_DIR} from './paths';
 
 const COMPOSITION_ID = 'MainScene';
 
 export type ExportFormat = 'mp4' | 'webm';
+
+// Message reconnu côté renderer pour distinguer une annulation volontaire d'une
+// vraie erreur d'export (voir App.tsx) : seul le message de l'Error survit à l'IPC.
+export const EXPORT_CANCELLED_MESSAGE = 'EXPORT_CANCELLED';
+
+// Un seul export à la fois (l'UI désactive le bouton pendant un export) : de simples
+// variables de niveau module suffisent, pas besoin de suivre un id de job.
+let cancelRunningExport: (() => void) | null = null;
+let cancelWasRequested = false;
+
+export function cancelExport(): void {
+  cancelWasRequested = true;
+  cancelRunningExport?.();
+}
 
 /**
  * On rebundle à chaque export (quelques secondes) plutôt que de réutiliser un bundle
@@ -32,63 +46,81 @@ export async function exportVideo(
   format: ExportFormat,
   onProgress: (progress: number) => void,
 ): Promise<string> {
-  const serveUrl = await getServeUrl();
+  // Créé avant le bundling (pas seulement avant renderMedia) : si l'utilisateur annule
+  // pendant le bundling/selectComposition (qui ne sont pas eux-mêmes annulables), le
+  // cancelSignal est déjà marqué "cancelled" et fera avorter renderMedia() dès son tout
+  // début au lieu de laisser tourner le rendu complet.
+  const {cancelSignal, cancel} = makeCancelSignal();
+  cancelRunningExport = cancel;
+  cancelWasRequested = false;
 
-  const composition = await selectComposition({
-    serveUrl,
-    id: COMPOSITION_ID,
-    inputProps,
-  });
+  let outputPath: string;
 
-  fs.mkdirSync(OUTPUT_DIR, {recursive: true});
-  const outputPath = path.join(OUTPUT_DIR, `export_${timestampForFilename()}.${format}`);
+  try {
+    const serveUrl = await getServeUrl();
 
-  await renderMedia({
-    composition,
-    serveUrl,
-    codec: format === 'webm' ? 'vp9' : 'h264',
-    pixelFormat: 'yuv420p',
-    outputLocation: outputPath,
-    inputProps,
-    onProgress: ({progress}) => onProgress(progress),
-    // Chaque frame est piquée vers ffmpeg en JPEG avant l'encodage final ; passer
-    // sa qualité au maximum réduit la perte de qualité (légers artefacts de
-    // contraste/teinte) qui s'accumule avec la compression du codec final.
-    jpegQuality: 100,
-    /**
-     * Remotion pipe les frames vers ffmpeg en JPEG (JPEG utilise toujours la
-     * pleine plage 0-255), ce qui fait sortir l'encodage vidéo en "full range"
-     * (yuvj420p / color_range=pc). La plupart des lecteurs/outils broadcast
-     * (VLC, OBS, Twitch...) attendent la plage limitée standard (16-235) pour du
-     * H.264/VP9 classique et n'honorent pas toujours ce tag correctement, ce qui
-     * donnait un rendu bien plus contrasté qu'à l'écran une fois exporté.
-     *
-     * (Forcer aussi la matrice en bt709 a été testé pour un souci de teinte
-     * rouge->orange séparé, mais n'a rien changé au rendu réel : la cause de ce
-     * souci-là est ailleurs, donc on ne garde que le fix de plage ici.)
-     *
-     * L'étape qui fait l'encodage réel varie selon le codec : pour le H.264 c'est
-     * la phase 'pre-stitcher' (la phase 'stitcher' ne fait que copier/muxer avec
-     * l'audio via -c:v copy, sans réencoder) ; pour le VP9/webm il n'y a qu'une
-     * seule phase 'stitcher' qui fait l'encodage ET le muxage en une fois. On
-     * détecte donc la bonne étape en cherchant un vrai encodeur vidéo dans -c:v
-     * plutôt qu'en se fiant au nom de la phase.
-     */
-    ffmpegOverride: ({args}) => {
-      const codecIndex = args.indexOf('-c:v');
-      const videoCodec = codecIndex !== -1 ? args[codecIndex + 1] : null;
-      if (videoCodec !== 'libx264' && videoCodec !== 'libvpx-vp9') return args;
-      const outputIndex = args.length - 1;
-      return [
-        ...args.slice(0, outputIndex),
-        '-vf',
-        'scale=in_range=full:out_range=limited',
-        '-color_range',
-        'tv',
-        ...args.slice(outputIndex),
-      ];
-    },
-  });
+    const composition = await selectComposition({
+      serveUrl,
+      id: COMPOSITION_ID,
+      inputProps,
+    });
+
+    fs.mkdirSync(OUTPUT_DIR, {recursive: true});
+    outputPath = path.join(OUTPUT_DIR, `export_${timestampForFilename()}.${format}`);
+
+    await renderMedia({
+      composition,
+      serveUrl,
+      codec: format === 'webm' ? 'vp9' : 'h264',
+      pixelFormat: 'yuv420p',
+      outputLocation: outputPath,
+      inputProps,
+      cancelSignal,
+      onProgress: ({progress}) => onProgress(progress),
+      // Chaque frame est piquée vers ffmpeg en JPEG avant l'encodage final ; passer
+      // sa qualité au maximum réduit la perte de qualité (légers artefacts de
+      // contraste/teinte) qui s'accumule avec la compression du codec final.
+      jpegQuality: 100,
+      /**
+       * Remotion pipe les frames vers ffmpeg en JPEG (JPEG utilise toujours la
+       * pleine plage 0-255), ce qui fait sortir l'encodage vidéo en "full range"
+       * (yuvj420p / color_range=pc). La plupart des lecteurs/outils broadcast
+       * (VLC, OBS, Twitch...) attendent la plage limitée standard (16-235) pour du
+       * H.264/VP9 classique et n'honorent pas toujours ce tag correctement, ce qui
+       * donnait un rendu bien plus contrasté qu'à l'écran une fois exporté.
+       *
+       * (Forcer aussi la matrice en bt709 a été testé pour un souci de teinte
+       * rouge->orange séparé, mais n'a rien changé au rendu réel : la cause de ce
+       * souci-là est ailleurs, donc on ne garde que le fix de plage ici.)
+       *
+       * L'étape qui fait l'encodage réel varie selon le codec : pour le H.264 c'est
+       * la phase 'pre-stitcher' (la phase 'stitcher' ne fait que copier/muxer avec
+       * l'audio via -c:v copy, sans réencoder) ; pour le VP9/webm il n'y a qu'une
+       * seule phase 'stitcher' qui fait l'encodage ET le muxage en une fois. On
+       * détecte donc la bonne étape en cherchant un vrai encodeur vidéo dans -c:v
+       * plutôt qu'en se fiant au nom de la phase.
+       */
+      ffmpegOverride: ({args}) => {
+        const codecIndex = args.indexOf('-c:v');
+        const videoCodec = codecIndex !== -1 ? args[codecIndex + 1] : null;
+        if (videoCodec !== 'libx264' && videoCodec !== 'libvpx-vp9') return args;
+        const outputIndex = args.length - 1;
+        return [
+          ...args.slice(0, outputIndex),
+          '-vf',
+          'scale=in_range=full:out_range=limited',
+          '-color_range',
+          'tv',
+          ...args.slice(outputIndex),
+        ];
+      },
+    });
+  } catch (err) {
+    if (cancelWasRequested) throw new Error(EXPORT_CANCELLED_MESSAGE);
+    throw err;
+  } finally {
+    cancelRunningExport = null;
+  }
 
   return outputPath;
 }

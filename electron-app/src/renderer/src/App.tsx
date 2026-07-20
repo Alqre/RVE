@@ -6,11 +6,24 @@ import type {ExportFormat} from '../../main/render';
 import {SlotPicker} from './components/SlotPicker';
 import {PreviewPlayer} from './components/PreviewPlayer';
 import {buildInputProps, deriveNameFromFile, initialValues, isSlotVisible, type SlotValues} from './buildProps';
+import appIcon from '../../../build-resources/icon.png';
 
 const EXPORT_FORMATS: {value: ExportFormat; label: string}[] = [
   {value: 'mp4', label: '.mp4'},
   {value: 'webm', label: '.webm'},
 ];
+
+// Doit rester identique à EXPORT_CANCELLED_MESSAGE dans main/render.ts : seul le
+// message de l'Error d'origine survit à la traversée de l'IPC.
+const EXPORT_CANCELLED_MESSAGE = 'EXPORT_CANCELLED';
+
+/** ex: 125000 -> "~2m 5s left" ; sous la minute -> "~45s left". */
+function formatRemaining(ms: number): string {
+  const totalSeconds = Math.max(0, Math.round(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes > 0 ? `~${minutes}m ${seconds}s left` : `~${seconds}s left`;
+}
 
 function sectionStartLabel(slot: SlotWithFiles): string | null {
   if (slot.id === 'tournamentName') return 'Tournament';
@@ -36,10 +49,13 @@ export const App: React.FC = () => {
   const [closeAppOnFinish, setCloseAppOnFinish] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [remainingLabel, setRemainingLabel] = useState<string | null>(null);
   const [resultPath, setResultPath] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cancelled, setCancelled] = useState(false);
   const playerRef = useRef<PlayerRef | null>(null);
   const pendingFrameRef = useRef<number | null>(null);
+  const exportStartRef = useRef<number | null>(null);
 
   // Le Player est remonté (voir previewNonce) à chaque sélection d'asset pour forcer le
   // rechargement du fichier depuis le disque. Sans ça, la lecture reviendrait à la frame 0
@@ -70,7 +86,17 @@ export const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    return window.api.onExportProgress((p) => setProgress(p));
+    return window.api.onExportProgress((p) => {
+      setProgress(p);
+      // Extrapolation simple à partir du temps déjà écoulé : peu fiable tant que la
+      // progression est trop faible (le tout début du rendu n'est pas représentatif
+      // du rythme moyen), donc on attend un minimum avant d'afficher une estimation.
+      if (exportStartRef.current !== null && p > 0.03) {
+        const elapsedMs = Date.now() - exportStartRef.current;
+        const totalEstimateMs = elapsedMs / p;
+        setRemainingLabel(formatRemaining(totalEstimateMs - elapsedMs));
+      }
+    });
   }, []);
 
   const linkedTargetIds = useMemo(() => {
@@ -148,8 +174,11 @@ export const App: React.FC = () => {
     if (!inputProps) return;
     setExporting(true);
     setProgress(0);
+    setRemainingLabel(null);
     setResultPath(null);
     setError(null);
+    setCancelled(false);
+    exportStartRef.current = Date.now();
     try {
       const outputPath = await window.api.startExport(inputProps, exportFormat, {
         openFolderOnFinish,
@@ -157,10 +186,20 @@ export const App: React.FC = () => {
       });
       setResultPath(outputPath);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      const message = err instanceof Error ? err.message : String(err);
+      if (message.includes(EXPORT_CANCELLED_MESSAGE)) {
+        setCancelled(true);
+      } else {
+        setError(message);
+      }
     } finally {
       setExporting(false);
+      exportStartRef.current = null;
     }
+  };
+
+  const handleCancelExport = () => {
+    window.api.cancelExport();
   };
 
   if (!slots || !inputProps) {
@@ -171,6 +210,7 @@ export const App: React.FC = () => {
     <div className="app">
       <header className="app-header">
         <div className="app-header-titles">
+          <img src={appIcon} alt="" className="app-logo" />
           <h1>Revival Video Exporter</h1>
           <p className="app-subtitle">
             Made by <span className="app-subtitle-highlight">Pikz</span>
@@ -256,20 +296,28 @@ export const App: React.FC = () => {
           )}
 
           <button className="export-button" onClick={handleExport} disabled={exporting}>
-            {exporting
-              ? `Exporting… ${Math.round(progress * 100)}%`
-              : `Export to ${EXPORT_FORMATS.find((f) => f.value === exportFormat)?.label}`}
+            {exporting ? 'Exporting…' : `Export to ${EXPORT_FORMATS.find((f) => f.value === exportFormat)?.label}`}
           </button>
 
-          {exporting && (
-            <div className="progress-bar">
-              <div className="progress-bar-fill" style={{width: `${progress * 100}%`}} />
-            </div>
-          )}
-
           {resultPath && <p className="export-success">Export complete: {resultPath}</p>}
+          {cancelled && <p className="export-cancelled">Export cancelled</p>}
           {error && <p className="export-error">Error during export: {error}</p>}
         </div>
+
+        {exporting && (
+          <div className="export-overlay">
+            <div className="export-overlay-content">
+              <span className="progress-percentage">{Math.round(progress * 100)}%</span>
+              <div className="progress-bar">
+                <div className="progress-bar-fill" style={{width: `${progress * 100}%`}} />
+              </div>
+              {remainingLabel && <span className="progress-remaining">{remainingLabel}</span>}
+              <button className="export-cancel-button" onClick={handleCancelExport}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

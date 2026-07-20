@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import {app, ipcMain, shell, BrowserWindow} from 'electron';
 import {listSlots, selectFileForSlot} from './assets';
-import {exportVideo, type ExportFormat} from './render';
+import {exportVideo, cancelExport, type ExportFormat} from './render';
 import {ASSETS_DIR, OUTPUT_DIR} from './paths';
 
 export interface ExportOptions {
@@ -32,6 +32,8 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('schedule:open', () => {
     return shell.openExternal('discord://discord.com/channels/1504940388836704306/1521553835598938142');
   });
+
+  ipcMain.handle('export:cancel', () => cancelExport());
 
   ipcMain.handle(
     'export:start',

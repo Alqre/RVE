@@ -25,7 +25,7 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
       <div className="slot">
         <label className="slot-label">{slot.label}</label>
         <input
-          className="slot-text-input"
+          className={`slot-text-input ${value.trim() !== '' ? 'slot-input-filled' : ''}`}
           type="text"
           value={value}
           placeholder={slot.placeholder}
@@ -40,7 +40,7 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
       <div className="slot">
         <label className="slot-label">{slot.label}</label>
         <input
-          className="slot-text-input"
+          className={`slot-text-input ${value.trim() !== '' ? 'slot-input-filled' : ''}`}
           type="datetime-local"
           value={value}
           onChange={(e) => onTextChange(slot.id, e.target.value)}
@@ -83,7 +83,7 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
     <div className="slot">
       <label className="slot-label">{slot.label}</label>
       <select
-        className={`slot-select ${!selectedSourcePath ? 'slot-select-empty' : ''}`}
+        className={`slot-select ${!selectedSourcePath ? 'slot-select-empty' : 'slot-input-filled'}`}
         value={selectedSourcePath ?? ''}
         onChange={(e) => {
           if (e.target.value) onPickFile(slot.id, e.target.value);

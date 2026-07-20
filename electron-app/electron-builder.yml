@@ -1,5 +1,5 @@
 appId: com.tournoi.exportscene
-productName: Revival Video Exporter
+productName: RVE
 directories:
   output: release-clean
   buildResources: build-resources

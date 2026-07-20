@@ -60,6 +60,11 @@ export function isSlotVisible(slot: SlotWithFiles, values: SlotValues): boolean 
   return slot.gameNumber <= activeGameCount(values);
 }
 
+// Suffixes de variante de map (ex: "Coal Tower II.png") : le title-case générique
+// ci-dessous mettrait tout sauf la 1re lettre en minuscule ("II" -> "Ii"), donc ces
+// mots-là gardent leurs majuscules telles quelles.
+const ROMAN_NUMERAL = /^(I|II|III|IV|V|VI|VII|VIII|IX|X)$/i;
+
 /**
  * Déduit un nom lisible à partir d'un nom de fichier (ex: "Dark lord.png" -> "Dark Lord",
  * "team-alpha.svg" -> "Team Alpha"), pour pré-remplir automatiquement le champ texte lié
@@ -68,5 +73,8 @@ export function isSlotVisible(slot: SlotWithFiles, values: SlotValues): boolean 
 export function deriveNameFromFile(fileName: string): string {
   const withoutExt = fileName.replace(/\.[^.]+$/, '');
   const spaced = withoutExt.replace(/[_-]+/g, ' ').trim();
-  return spaced.replace(/\S+/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+  return spaced.replace(/\S+/g, (word) => {
+    if (ROMAN_NUMERAL.test(word)) return word.toUpperCase();
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  });
 }

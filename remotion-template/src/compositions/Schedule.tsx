@@ -94,7 +94,7 @@ export const Schedule: React.FC<MainSceneProps> = ({ teamA, teamB, match1, match
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
 	});
-	const opacity_out = interpolate(frame, [420, 450], [1, 0], {
+	const opacity_out = interpolate(frame, [570, 600], [1, 0], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
@@ -115,7 +115,7 @@ export const Schedule: React.FC<MainSceneProps> = ({ teamA, teamB, match1, match
 					<p style={{ marginTop: -33, textAlign: 'center', color: '#121212', fontFamily: 'bebas kai', fontSize: 50, opacity: 1 }}>{schedulePeriod || '—'}</p>
 				</div >
 				<div style={{ display: 'flex', flexDirection: 'column', position: 'absolute', top: 240, right: 51, width: 800, opacity: opacity_1 }}>
-					<p style={{ textAlign: 'center', color: '#eb3636', fontFamily: 'bebas kai', fontSize: 50, opacity: 1 }}>CURRENT MATCH</p>
+					<p style={{ textAlign: 'center', color: '#eb3636', fontFamily: 'bebas kai', fontSize: 50, opacity: 1 }}>CURRENT MATCH UP</p>
 					<div style={{ textAlign: 'center', marginTop: -54 }}>
 						<span style={{ padding: 10, paddingLeft: 25, paddingRight: 25, backgroundColor: '#eb3636', color: '#e7e3db', fontFamily: 'bebas kai', fontSize: 80, opacity: 1 }}>{teamA.teamName || '—'} <span style={{ color: '#121212' }}>VS</span> {teamB.teamName || '—'}</span>
 					</div >
