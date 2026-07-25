@@ -4,6 +4,7 @@ import {registerAssetProtocolScheme, handleAssetProtocol} from './protocol';
 import {registerAppProtocolScheme, handleAppProtocol, APP_URL} from './appProtocol';
 import {registerIpcHandlers} from './ipc';
 import {initUpdater, checkForUpdates} from './updater';
+import {seedAssetsIfMissing} from './assetsSeed';
 
 Menu.setApplicationMenu(null);
 
@@ -38,6 +39,7 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
+  seedAssetsIfMissing();
   handleAssetProtocol();
   handleAppProtocol(path.join(__dirname, '../renderer'));
   registerIpcHandlers();

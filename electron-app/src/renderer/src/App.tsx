@@ -251,6 +251,7 @@ export const App: React.FC = () => {
 
   const updateAvailable = updateStatus?.state === 'available';
   const updateDownloading = updateStatus?.state === 'downloading';
+  const updateInstalling = updateStatus?.state === 'downloaded';
   const updateLabel =
     updateStatus?.state === 'available'
       ? 'Update'
@@ -286,7 +287,7 @@ export const App: React.FC = () => {
           <button
             className={`link-button update-button ${updateAvailable ? 'update-button-available' : ''}`}
             onClick={handleInstallUpdate}
-            disabled={!updateAvailable || updateDownloading || exporting}
+            disabled={!updateAvailable || updateDownloading || updateInstalling || exporting}
           >
             {updateLabel}
           </button>
@@ -404,6 +405,15 @@ export const App: React.FC = () => {
               <button className="export-cancel-button" onClick={handleCancelExport}>
                 Cancel
               </button>
+            </div>
+          </div>
+        )}
+
+        {updateInstalling && (
+          <div className="export-overlay">
+            <div className="export-overlay-content">
+              <span className="update-installing-title">Installing update…</span>
+              <span className="progress-remaining">The app will restart automatically. This can take a minute.</span>
             </div>
           </div>
         )}

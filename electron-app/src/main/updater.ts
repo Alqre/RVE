@@ -19,7 +19,7 @@ export function initUpdater(win: BrowserWindow): void {
   autoUpdater.on('download-progress', (progress) => send({state: 'downloading', percent: progress.percent}));
   autoUpdater.on('update-downloaded', () => {
     send({state: 'downloaded'});
-    autoUpdater.quitAndInstall();
+    setTimeout(() => autoUpdater.quitAndInstall(), 1500);
   });
   autoUpdater.on('error', (err) => send({state: 'error', message: err.message}));
 }

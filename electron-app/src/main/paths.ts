@@ -5,6 +5,10 @@ export const ASSETS_DIR = app.isPackaged
   ? path.join(path.dirname(app.getPath('exe')), 'assets')
   : path.join(app.getAppPath(), '..', 'assets');
 
+export const SEED_ASSETS_DIR = app.isPackaged
+  ? path.join(process.resourcesPath, 'assets-seed')
+  : path.join(app.getAppPath(), '..', 'assets');
+
 export const REMOTION_DIR = app.isPackaged
   ? path.join(process.resourcesPath, 'remotion-template')
   : path.join(app.getAppPath(), '..', 'remotion-template');
