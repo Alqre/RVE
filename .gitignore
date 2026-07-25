@@ -12,7 +12,9 @@ remotion-template/public/selected/*
 # Electron
 electron-app/out/
 electron-app/dist/
-electron-app/release*/
+electron-app/release/
+electron-app/release-new/
+electron-app/release-clean/
 
 # Exports produits par l'appli
 output/

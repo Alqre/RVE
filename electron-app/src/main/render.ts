@@ -8,12 +8,8 @@ const COMPOSITION_ID = 'MainScene';
 
 export type ExportFormat = 'mp4' | 'webm';
 
-// Message reconnu côté renderer pour distinguer une annulation volontaire d'une
-// vraie erreur d'export (voir App.tsx) : seul le message de l'Error survit à l'IPC.
 export const EXPORT_CANCELLED_MESSAGE = 'EXPORT_CANCELLED';
 
-// Un seul export à la fois (l'UI désactive le bouton pendant un export) : de simples
-// variables de niveau module suffisent, pas besoin de suivre un id de job.
 let cancelRunningExport: (() => void) | null = null;
 let cancelWasRequested = false;
 
@@ -22,17 +18,10 @@ export function cancelExport(): void {
   cancelRunningExport?.();
 }
 
-/**
- * On rebundle à chaque export (quelques secondes) plutôt que de réutiliser un bundle
- * pré-construit : le bundle capture un instantané de public/selected au moment du
- * bundling, or ce dossier change à chaque nouvelle sélection d'asset. Un bundle
- * mis en cache ou pré-construit au packaging servirait des assets périmés.
- */
 async function getServeUrl(): Promise<string> {
   return bundle({entryPoint: path.join(REMOTION_DIR, 'src', 'index.ts')});
 }
 
-/** ex: "19072026_2120" (DDMMYYYY_HHmm, heure locale au moment de l'export). */
 function timestampForFilename(): string {
   const now = new Date();
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -46,10 +35,6 @@ export async function exportVideo(
   format: ExportFormat,
   onProgress: (progress: number) => void,
 ): Promise<string> {
-  // Créé avant le bundling (pas seulement avant renderMedia) : si l'utilisateur annule
-  // pendant le bundling/selectComposition (qui ne sont pas eux-mêmes annulables), le
-  // cancelSignal est déjà marqué "cancelled" et fera avorter renderMedia() dès son tout
-  // début au lieu de laisser tourner le rendu complet.
   const {cancelSignal, cancel} = makeCancelSignal();
   cancelRunningExport = cancel;
   cancelWasRequested = false;
@@ -77,29 +62,7 @@ export async function exportVideo(
       inputProps,
       cancelSignal,
       onProgress: ({progress}) => onProgress(progress),
-      // Chaque frame est piquée vers ffmpeg en JPEG avant l'encodage final ; passer
-      // sa qualité au maximum réduit la perte de qualité (légers artefacts de
-      // contraste/teinte) qui s'accumule avec la compression du codec final.
       jpegQuality: 100,
-      /**
-       * Remotion pipe les frames vers ffmpeg en JPEG (JPEG utilise toujours la
-       * pleine plage 0-255), ce qui fait sortir l'encodage vidéo en "full range"
-       * (yuvj420p / color_range=pc). La plupart des lecteurs/outils broadcast
-       * (VLC, OBS, Twitch...) attendent la plage limitée standard (16-235) pour du
-       * H.264/VP9 classique et n'honorent pas toujours ce tag correctement, ce qui
-       * donnait un rendu bien plus contrasté qu'à l'écran une fois exporté.
-       *
-       * (Forcer aussi la matrice en bt709 a été testé pour un souci de teinte
-       * rouge->orange séparé, mais n'a rien changé au rendu réel : la cause de ce
-       * souci-là est ailleurs, donc on ne garde que le fix de plage ici.)
-       *
-       * L'étape qui fait l'encodage réel varie selon le codec : pour le H.264 c'est
-       * la phase 'pre-stitcher' (la phase 'stitcher' ne fait que copier/muxer avec
-       * l'audio via -c:v copy, sans réencoder) ; pour le VP9/webm il n'y a qu'une
-       * seule phase 'stitcher' qui fait l'encodage ET le muxage en une fois. On
-       * détecte donc la bonne étape en cherchant un vrai encodeur vidéo dans -c:v
-       * plutôt qu'en se fiant au nom de la phase.
-       */
       ffmpegOverride: ({args}) => {
         const codecIndex = args.indexOf('-c:v');
         const videoCodec = codecIndex !== -1 ? args[codecIndex + 1] : null;

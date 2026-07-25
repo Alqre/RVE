@@ -9,8 +9,6 @@ body {
   color: #f0f0f2;
   scrollbar-color: #3a3a45 #1c1c22;
   scrollbar-width: thin;
-  /* Fait rendre les contrôles natifs (case à cocher, etc.) dans leur variante sombre
-     par défaut du navigateur, plutôt que la case blanche habituelle. */
   color-scheme: dark;
 }
 
@@ -97,6 +95,26 @@ body {
 
 .link-button:hover {
   border-color: #888;
+}
+
+.update-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.update-button:disabled:hover {
+  border-color: #444;
+}
+
+.update-button-available:not(:disabled) {
+  background: #1f9d55;
+  border-color: #1f9d55;
+  color: #fff;
+}
+
+.update-button-available:not(:disabled):hover {
+  background: #24b862;
+  border-color: #24b862;
 }
 
 .discord-button {
@@ -220,6 +238,26 @@ body {
 .slot-empty {
   font-size: 13px;
   color: #888;
+}
+
+.clear-group-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.clear-group-button {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.clear-group-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.clear-group-button:disabled:hover {
+  border-color: #444;
 }
 
 .slot-section-title {

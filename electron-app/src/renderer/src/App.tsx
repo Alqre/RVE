@@ -3,9 +3,18 @@ import type {PlayerRef} from '@remotion/player';
 import type {SlotWithFiles} from '../../main/assets';
 import type {MainSceneProps} from '../../../../remotion-template/src/schema';
 import type {ExportFormat} from '../../main/render';
+import type {UpdaterStatus} from '../../main/updater';
 import {SlotPicker} from './components/SlotPicker';
 import {PreviewPlayer} from './components/PreviewPlayer';
-import {buildInputProps, deriveNameFromFile, initialValues, isSlotVisible, type SlotValues} from './buildProps';
+import {
+  buildInputProps,
+  deriveNameFromFile,
+  initialValues,
+  isSlotVisible,
+  slotGroup,
+  type SlotGroup,
+  type SlotValues,
+} from './buildProps';
 import appIcon from '../../../build-resources/icon.png';
 
 const EXPORT_FORMATS: {value: ExportFormat; label: string}[] = [
@@ -13,11 +22,14 @@ const EXPORT_FORMATS: {value: ExportFormat; label: string}[] = [
   {value: 'webm', label: '.webm'},
 ];
 
-// Doit rester identique à EXPORT_CANCELLED_MESSAGE dans main/render.ts : seul le
-// message de l'Error d'origine survit à la traversée de l'IPC.
 const EXPORT_CANCELLED_MESSAGE = 'EXPORT_CANCELLED';
 
-/** ex: 125000 -> "~2m 5s left" ; sous la minute -> "~45s left". */
+const CLEAR_GROUPS: {group: SlotGroup; label: string}[] = [
+  {group: 'matchInfo', label: 'Clear match info'},
+  {group: 'games', label: 'Clear games'},
+  {group: 'schedule', label: 'Clear schedule'},
+];
+
 function formatRemaining(ms: number): string {
   const totalSeconds = Math.max(0, Math.round(ms / 1000));
   const minutes = Math.floor(totalSeconds / 60);
@@ -53,13 +65,11 @@ export const App: React.FC = () => {
   const [resultPath, setResultPath] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cancelled, setCancelled] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<UpdaterStatus | null>(null);
   const playerRef = useRef<PlayerRef | null>(null);
   const pendingFrameRef = useRef<number | null>(null);
   const exportStartRef = useRef<number | null>(null);
 
-  // Le Player est remonté (voir previewNonce) à chaque sélection d'asset pour forcer le
-  // rechargement du fichier depuis le disque. Sans ça, la lecture reviendrait à la frame 0
-  // à chaque sélection : on restaure donc la position juste après le remontage.
   useEffect(() => {
     if (pendingFrameRef.current !== null) {
       playerRef.current?.seekTo(pendingFrameRef.current);
@@ -68,29 +78,46 @@ export const App: React.FC = () => {
   }, [previewNonce]);
 
   useEffect(() => {
-    window.api.listSlots().then((loaded) => {
+    Promise.all([window.api.listSlots(), window.api.loadState()]).then(([loaded, saved]) => {
       setSlots(loaded);
-      setValues(initialValues(loaded));
 
-      // Un slot à fichier unique (ex: bracket) est auto-sélectionné côté main process
-      // (voir listSlots() dans assets.ts) : on reflète ce choix dans le dropdown dès le
-      // départ, sinon il affiche "Empty" alors qu'un fichier est bien utilisé.
       const autoSelected: SlotValues = {};
       for (const slot of loaded) {
         if ((slot.type === 'image' || slot.type === 'video') && slot.files.length === 1) {
           autoSelected[slot.id] = slot.files[0].path;
         }
       }
+
+      const restoredValues = initialValues(loaded);
+      if (saved) {
+        const knownIds = new Set(loaded.map((s) => s.id));
+        for (const [id, value] of Object.entries(saved.values)) {
+          if (knownIds.has(id)) restoredValues[id] = value;
+        }
+        for (const [id, source] of Object.entries(saved.selectedSource)) {
+          if (knownIds.has(id)) autoSelected[id] = source;
+        }
+      }
+      setValues(restoredValues);
       setSelectedSource(autoSelected);
     });
   }, []);
 
   useEffect(() => {
+    if (!slots) return;
+    const timeout = setTimeout(() => {
+      window.api.saveState({values, selectedSource});
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [slots, values, selectedSource]);
+
+  useEffect(() => {
+    return window.api.onUpdateStatus(setUpdateStatus);
+  }, []);
+
+  useEffect(() => {
     return window.api.onExportProgress((p) => {
       setProgress(p);
-      // Extrapolation simple à partir du temps déjà écoulé : peu fiable tant que la
-      // progression est trop faible (le tout début du rendu n'est pas représentatif
-      // du rythme moyen), donc on attend un minimum avant d'afficher une estimation.
       if (exportStartRef.current !== null && p > 0.03) {
         const elapsedMs = Date.now() - exportStartRef.current;
         const totalEstimateMs = elapsedMs / p;
@@ -107,12 +134,19 @@ export const App: React.FC = () => {
     return ids;
   }, [slots]);
 
-  // Les slots texte auto-remplis (nom d'équipe, de killer, de map, de caster...) ne sont
-  // pas affichés : ils sont dérivés du fichier choisi dans le slot image correspondant.
   const visibleSlots = useMemo(
     () => (slots ?? []).filter((slot) => isSlotVisible(slot, values) && !linkedTargetIds.has(slot.id)),
     [slots, values, linkedTargetIds],
   );
+
+  const clearGroupSlotIds = useMemo(() => {
+    const result: Record<SlotGroup, string[]> = {matchInfo: [], games: [], schedule: []};
+    for (const slot of visibleSlots) {
+      const group = slotGroup(slot);
+      if (group) result[group].push(slot.id);
+    }
+    return result;
+  }, [visibleSlots]);
 
   const allSlotsFilled = useMemo(
     () => visibleSlots.every((slot) => (values[slot.id] ?? '').trim() !== ''),
@@ -142,29 +176,33 @@ export const App: React.FC = () => {
         ? prev.map((s) => (s.id === slotId ? {...s, currentFile: relativePath.replace('selected/', '')} : s))
         : prev,
     );
-    // Le fichier copié dans public/selected garde le même nom pour un même slot (ex:
-    // toujours "teamALogo.png"), donc la prop peut rester identique même si le contenu a
-    // changé : on force un remontage complet du Player pour être sûr que l'aperçu recharge
-    // bien la nouvelle image depuis le disque plutôt que de garder l'ancienne à l'écran.
     pendingFrameRef.current = playerRef.current?.getCurrentFrame() ?? null;
     setPreviewNonce((n) => n + 1);
   };
 
-  const handleClearSlot = (slotId: string) => {
-    const slot = slots?.find((s) => s.id === slotId);
+  const handleClearGroup = (slotIds: string[]) => {
+    if (slotIds.length === 0) return;
 
     setValues((prev) => {
-      const next = {...prev, [slotId]: ''};
-      if (slot?.linkedTextSlot) {
-        next[slot.linkedTextSlot] = '';
+      const next = {...prev};
+      for (const slotId of slotIds) {
+        next[slotId] = '';
+        const slot = slots?.find((s) => s.id === slotId);
+        if (slot?.linkedTextSlot) next[slot.linkedTextSlot] = '';
       }
       return next;
     });
-    setSelectedSource((prev) => ({...prev, [slotId]: ''}));
-    setSlots((prev) => (prev ? prev.map((s) => (s.id === slotId ? {...s, currentFile: null} : s)) : prev));
+    setSelectedSource((prev) => {
+      const next = {...prev};
+      for (const slotId of slotIds) next[slotId] = '';
+      return next;
+    });
+    setSlots((prev) => (prev ? prev.map((s) => (slotIds.includes(s.id) ? {...s, currentFile: null} : s)) : prev));
     pendingFrameRef.current = playerRef.current?.getCurrentFrame() ?? null;
     setPreviewNonce((n) => n + 1);
   };
+
+  const handleClearSlot = (slotId: string) => handleClearGroup([slotId]);
 
   const handleTextChange = (slotId: string, value: string) => {
     setValues((prev) => ({...prev, [slotId]: value}));
@@ -202,6 +240,19 @@ export const App: React.FC = () => {
     window.api.cancelExport();
   };
 
+  const handleInstallUpdate = () => {
+    window.api.installUpdate();
+  };
+
+  const updateAvailable = updateStatus?.state === 'available';
+  const updateDownloading = updateStatus?.state === 'downloading';
+  const updateLabel =
+    updateStatus?.state === 'available'
+      ? `Update available (v${updateStatus.version})`
+      : updateStatus?.state === 'downloading'
+        ? `Updating… ${Math.round(updateStatus.percent)}%`
+        : 'Up to date';
+
   if (!slots || !inputProps) {
     return <div className="app-loading">Loading slots…</div>;
   }
@@ -217,6 +268,13 @@ export const App: React.FC = () => {
           </p>
         </div>
         <div className="app-header-actions">
+          <button
+            className={`link-button update-button ${updateAvailable ? 'update-button-available' : ''}`}
+            onClick={handleInstallUpdate}
+            disabled={!updateAvailable || updateDownloading || exporting}
+          >
+            {updateLabel}
+          </button>
           <button className="link-button" onClick={() => window.api.openAssetsFolder()}>
             Open assets folder
           </button>
@@ -234,6 +292,22 @@ export const App: React.FC = () => {
 
       <div className="app-body">
         <div className="slots-panel">
+          <div className="clear-group-buttons">
+            {CLEAR_GROUPS.map(({group, label}) => {
+              const slotIds = clearGroupSlotIds[group];
+              const hasValue = slotIds.some((id) => (values[id] ?? '').trim() !== '');
+              return (
+                <button
+                  key={group}
+                  className="link-button clear-group-button"
+                  onClick={() => handleClearGroup(slotIds)}
+                  disabled={!hasValue}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
           {visibleSlots.map((slot) => {
             const sectionLabel = sectionStartLabel(slot);
             return (

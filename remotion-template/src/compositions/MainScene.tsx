@@ -7,8 +7,8 @@ import {Bracket} from './Bracket';
 import {Planning} from './Planning';
 import {Schedule} from './Schedule';
 
-export const INTRO_DURATION = 600; // 20s @ 30fps
-export const OTHER_SUB_SCENE_DURATION = 600; // 20s @ 30fps
+export const INTRO_DURATION = 600;
+export const OTHER_SUB_SCENE_DURATION = 600;
 
 export function getTotalDuration(matchFormat: MatchFormat): number {
 	return INTRO_DURATION + getPlanningDuration(matchFormat) + OTHER_SUB_SCENE_DURATION * 2;

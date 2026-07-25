@@ -41,14 +41,10 @@ const Placeholder: React.FC<{ width: number; height: number }> = ({ width, heigh
 	<div style={{ width, height, border: '2px dashed #444', borderRadius: 12 }} />
 );
 
-// Mise en page par format : BO3 tient sur une seule ligne fixe (taille un peu plus
-// grande que la base). BO5/BO7 ne tiennent pas tous sur une ligne à cette taille : au
-// lieu de les répartir sur 2 lignes, elles défilent en carrousel (voir CarouselRow)
-// dans une fenêtre à largeur fixe, avec un fondu transparent sur les bords.
-const FORMAT_LAYOUT: Record<MatchFormat, { scale: number; columnGap: number; carousel: boolean }> = {
-	BO3: { scale: 1.6, columnGap: 305, carousel: false },
-	BO5: { scale: 1.6, columnGap: 305, carousel: true },
-	BO7: { scale: 1.6, columnGap: 305, carousel: true },
+const FORMAT_LAYOUT: Record<MatchFormat, { scale: number; columnGap: number; carousel: boolean, TimeInFrames: number }> = {
+	BO3: { scale: 1.6, columnGap: 305, carousel: false, TimeInFrames: 600 },
+	BO5: { scale: 1.6, columnGap: 305, carousel: true, TimeInFrames: 900 },
+	BO7: { scale: 1.6, columnGap: 305, carousel: true, TimeInFrames: 1200 },
 };
 
 const GameColumn: React.FC<{
@@ -66,9 +62,7 @@ const GameColumn: React.FC<{
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: s(12), opacity, width: s(160) }}>
-			<div style={{ border: '3px solid #eb3636', padding: s(4), position: 'relative', width: s(294), height: s(206) }}>
-				{/* Numéro de la game, sur le bord gauche du cadre plutôt qu'un label "Game N"
-				    au-dessus. En dernier dans le DOM pour rester au-dessus de la map/du tueur. */}
+			<div style={{ border: '3px solid #eb3636', padding: s(4), position: 'relative', width: s(294), height: s(204) }}>
 				<div
 					style={{
 						position: 'absolute',
@@ -95,8 +89,6 @@ const GameColumn: React.FC<{
 				) : (
 					<Placeholder width={s(282)} height={s(192)} />
 				)}
-				{/* Superposé au-dessus de la map, ancré à gauche (position absolute dans le
-				    même conteneur relative) plutôt qu'empilé en-dessous. */}
 				<div style={{ position: 'absolute', left: s(-20), top: s(-4) }}>
 					{game.killerSrc ? (
 						<Img
@@ -104,11 +96,6 @@ const GameColumn: React.FC<{
 							style={{
 								height: s(198),
 								objectFit: 'contain',
-								// Opaque à droite, fondu transparent vers la gauche (le côté où le
-								// tueur se superpose sur la map) pour une transition plus douce. En
-								// pixels (pas en %) car la largeur réelle de l'image varie selon son
-								// ratio naturel (seule la hauteur est fixée) : des repères en % du
-								// coup produiraient un fondu tantôt trop large, tantôt invisible.
 								WebkitMaskImage: `linear-gradient(to right, black ${s(150)}px, transparent ${s(170)}px)`,
 								maskImage: `linear-gradient(to right, black ${s(150)}px, transparent ${s(170)}px)`,
 							}}
@@ -117,8 +104,6 @@ const GameColumn: React.FC<{
 						<Placeholder width={s(160)} height={s(192)} />
 					)}
 				</div>
-				{/* Équipe qui a pick le tueur de cette game (alterne A/B), sauf la dernière
-				    game qui est toujours un tiebreaker. */}
 				<div style={{ position: 'absolute', top: s(8), right: s(8) }}>
 					{isTiebreaker ? (
 						<div
@@ -158,9 +143,6 @@ const GameColumn: React.FC<{
 	);
 };
 
-// Largeur de la fenêtre visible du carrousel et largeur du fondu sur chacun de ses
-// bords (en pixels, indépendant de l'échelle du format : c'est la fenêtre elle-même
-// qui reste fixe, pas son contenu).
 const CAROUSEL_VIEWPORT_WIDTH = 1500;
 const CAROUSEL_EDGE_FADE = 300;
 
@@ -175,34 +157,15 @@ const CarouselRow: React.FC<{
 	teamB: TeamInfo;
 	durationInFrames: number;
 }> = ({ games, frame, scale, columnGap, teamA, teamB, durationInFrames }) => {
-	// GameColumn positionne son cadre bordé (296 de large) centré à l'intérieur d'un
-	// conteneur flex de 160 de large (voir GameColumn) : c'est cette largeur de 160,
-	// pas celle du cadre qui déborde visuellement, qui détermine l'espacement réel
-	// entre les colonnes dans la ligne flex.
 	const columnWidth = 160 * scale;
 	const step = columnWidth + columnGap;
-	// Le défilement va du centrage de la 1re game au centrage de la dernière (pas d'un
-	// bord de la piste à l'autre) : la game 1 démarre au milieu de l'écran, la dernière
-	// y termine aussi, celles du milieu ne font que passer entre les deux.
 	const firstGameCenteredOffset = CAROUSEL_VIEWPORT_WIDTH / 2 - columnWidth / 2;
 	const lastGameCenterLocal = (games.length - 1) * step + columnWidth / 2;
 	const lastGameCenteredOffset = CAROUSEL_VIEWPORT_WIDTH / 2 - lastGameCenterLocal;
-	// Défilement découpé en 3 segments plutôt qu'un seul ease-in-out sur toute la
-	// durée : 2s d'accélération, une vitesse constante (linéaire) au milieu, puis 2s
-	// de décélération avant l'arrêt. Sans ça, un ease-in-out unique ralentit/accélère
-	// en continu et n'atteint jamais de vitesse de croisière stable.
-	// moveStart/rampDuration restent fixes (1s de statique, 2s de rampe) quelle que
-	// soit la durée de la scène ; c'est le palier à vitesse constante du milieu qui
-	// s'étire pour BO5/BO7 (plus de games à traverser), via moveEnd = durée - 30.
 	const moveStart = 30;
 	const moveEnd = durationInFrames - 30;
-	const rampDuration = 60; // 2s d'accélération, puis 2s de décélération symétrique
+	const rampDuration = 60;
 	const totalMoveDuration = moveEnd - moveStart;
-	// Part de la distance totale couverte par chaque rampe, dérivée de rampDuration
-	// (plutôt qu'une valeur arbitraire) : avec une rampe en t², la vitesse en fin de
-	// rampe est exactement celle du segment linéaire qui suit, donc pas de à-coup à
-	// la jonction. cf. dérivation : v_linéaire = 1/(totalMoveDuration - rampDuration),
-	// distance de la rampe = v_linéaire * rampDuration / 2.
 	const rampFraction = rampDuration / (2 * (totalMoveDuration - rampDuration));
 	const progress = (() => {
 		const rampInEnd = moveStart + rampDuration;
@@ -236,8 +199,6 @@ const CarouselRow: React.FC<{
 			style={{
 				width: CAROUSEL_VIEWPORT_WIDTH,
 				overflow: 'hidden',
-				// Transparent aux deux bords, opaque au centre : les games entrent/sortent
-				// du carrousel en fondu plutôt que d'être coupées net.
 				WebkitMaskImage: `linear-gradient(to right, transparent 0, black ${CAROUSEL_EDGE_FADE}px, black calc(100% - ${CAROUSEL_EDGE_FADE}px), transparent 100%)`,
 				maskImage: `linear-gradient(to right, transparent 0, black ${CAROUSEL_EDGE_FADE}px, black calc(100% - ${CAROUSEL_EDGE_FADE}px), transparent 100%)`,
 			}}
@@ -245,7 +206,6 @@ const CarouselRow: React.FC<{
 			<div style={{ display: 'flex', gap: columnGap, transform: `translateX(${offset}px)` }}>
 				{games.map((game, index) => {
 					const isTiebreaker = index === games.length - 1;
-					// Alterne A/B en commençant par l'équipe A à la game 1 (index 0).
 					const picker = index % 2 === 0 ? teamA : teamB;
 					return (
 						<GameColumn
@@ -273,9 +233,6 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 	const activeCount = GAMES_BY_FORMAT[matchFormat] ?? GAMES_BY_FORMAT.BO3;
 	const activeGames = allGames.slice(0, activeCount);
 	const layout = FORMAT_LAYOUT[matchFormat] ?? FORMAT_LAYOUT.BO3;
-	// Durée réelle de cette sous-scène pour ce format (20/30/40s selon BO3/BO5/BO7,
-	// voir schema.ts) : le fondu d'entrée/sortie de toute la scène doit se caler sur
-	// ses 30 dernières frames, pas sur une durée fixe de 600.
 	const durationInFrames = getPlanningDuration(matchFormat);
 	const fadeInOpacity = interpolate(frame, [0, 30], [1, 0], {
 		extrapolateLeft: 'clamp',
@@ -291,7 +248,7 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
 	});
-	const opacity_out = interpolate(frame, [1170, 1200], [1, 0], {
+	const opacity_out = interpolate(frame, [layout.TimeInFrames-30, layout.TimeInFrames], [1, 0], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
@@ -361,7 +318,6 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 						<div style={{ display: 'flex', gap: layout.columnGap }}>
 							{activeGames.map((game, index) => {
 								const isTiebreaker = index === activeGames.length - 1;
-								// Alterne A/B en commençant par l'équipe A à la game 1 (index 0).
 								const picker = index % 2 === 0 ? teamA : teamB;
 								return (
 									<GameColumn

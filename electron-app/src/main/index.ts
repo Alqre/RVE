@@ -3,19 +3,18 @@ import path from 'node:path';
 import {registerAssetProtocolScheme, handleAssetProtocol} from './protocol';
 import {registerAppProtocolScheme, handleAppProtocol, APP_URL} from './appProtocol';
 import {registerIpcHandlers} from './ipc';
+import {initUpdater, checkForUpdates} from './updater';
 
 Menu.setApplicationMenu(null);
 
 registerAssetProtocolScheme();
 registerAppProtocolScheme();
 
-// En dev, l'icône vient du dossier source ; une fois packagée, electron-builder la
-// copie dans resources/ (voir extraResources dans electron-builder.yml).
 const iconPath = app.isPackaged
   ? path.join(process.resourcesPath, 'icon.png')
   : path.join(__dirname, '../../build-resources/icon.png');
 
-function createWindow(): void {
+function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
     width: 1360,
     height: 900,
@@ -34,13 +33,18 @@ function createWindow(): void {
   } else {
     win.loadURL(APP_URL);
   }
+
+  return win;
 }
 
 app.whenReady().then(() => {
   handleAssetProtocol();
   handleAppProtocol(path.join(__dirname, '../renderer'));
   registerIpcHandlers();
-  createWindow();
+  const win = createWindow();
+
+  initUpdater(win);
+  if (app.isPackaged) checkForUpdates();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

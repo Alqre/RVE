@@ -2,6 +2,8 @@ import {contextBridge, ipcRenderer} from 'electron';
 import type {SlotWithFiles} from '../main/assets';
 import type {ExportFormat} from '../main/render';
 import type {ExportOptions} from '../main/ipc';
+import type {SavedInputState} from '../main/state';
+import type {UpdaterStatus} from '../main/updater';
 
 export interface AppApi {
   listSlots: () => Promise<SlotWithFiles[]>;
@@ -12,6 +14,10 @@ export interface AppApi {
   startExport: (inputProps: Record<string, unknown>, format: ExportFormat, options: ExportOptions) => Promise<string>;
   cancelExport: () => Promise<void>;
   onExportProgress: (callback: (progress: number) => void) => () => void;
+  loadState: () => Promise<SavedInputState | null>;
+  saveState: (state: SavedInputState) => Promise<void>;
+  installUpdate: () => Promise<void>;
+  onUpdateStatus: (callback: (status: UpdaterStatus) => void) => () => void;
 }
 
 const api: AppApi = {
@@ -26,6 +32,14 @@ const api: AppApi = {
     const listener = (_event: unknown, progress: number) => callback(progress);
     ipcRenderer.on('export:progress', listener);
     return () => ipcRenderer.removeListener('export:progress', listener);
+  },
+  loadState: () => ipcRenderer.invoke('state:load'),
+  saveState: (state) => ipcRenderer.invoke('state:save', state),
+  installUpdate: () => ipcRenderer.invoke('updater:install'),
+  onUpdateStatus: (callback) => {
+    const listener = (_event: unknown, status: UpdaterStatus) => callback(status);
+    ipcRenderer.on('updater:status', listener);
+    return () => ipcRenderer.removeListener('updater:status', listener);
   },
 };
 

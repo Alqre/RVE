@@ -15,11 +15,6 @@ const MIME_TYPES: Record<string, string> = {
   '.webm': 'video/webm',
 };
 
-/**
- * Doit être appelé avant `app.whenReady()`.
- * Permet de servir des fichiers arbitraires du disque (bibliothèque d'assets) à l'UI
- * sans désactiver websecurity et sans exposer un accès Node direct au renderer.
- */
 export function registerAssetProtocolScheme(): void {
   protocol.registerSchemesAsPrivileged([
     {
@@ -29,17 +24,10 @@ export function registerAssetProtocolScheme(): void {
   ]);
 }
 
-/**
- * Doit être appelé après `app.whenReady()`.
- * On lit le fichier nous-mêmes et on fixe le Content-Type explicitement : laisser
- * Chromium deviner le type MIME d'une URL file:// est peu fiable (les .svg en
- * particulier finissent souvent sans type correct, ce qui casse le décodage <img>).
- */
 export function handleAssetProtocol(): void {
   protocol.handle(ASSET_PROTOCOL, async (request) => {
     const url = new URL(request.url);
     let pathname = decodeURIComponent(url.pathname);
-    // "/C:/Users/..." -> "C:/Users/..." (chemins Windows avec lettre de lecteur)
     if (/^\/[A-Za-z]:/.test(pathname)) {
       pathname = pathname.slice(1);
     }

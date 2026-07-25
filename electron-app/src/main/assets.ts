@@ -11,13 +11,9 @@ export interface ManifestSlot {
   label: string;
   propPath: string;
   folder?: string;
-  /** Pour un slot texte : exemple affiché en placeholder tant que le champ est vide. */
   placeholder?: string;
-  /** Pour un slot image/video : id d'un slot texte à auto-remplir avec le nom du fichier choisi. */
   linkedTextSlot?: string;
-  /** Pour un slot 'select' : les valeurs proposées. */
   options?: string[];
-  /** Pour les slots liés à une manche (killer/map) : numéro de manche, utilisé pour le filtrage selon le format BO3/BO5/BO7. */
   gameNumber?: number;
 }
 
@@ -33,7 +29,6 @@ export interface AssetFile {
 
 export interface SlotWithFiles extends ManifestSlot {
   files: AssetFile[];
-  /** Nom du fichier actuellement copié dans public/selected pour ce slot, s'il existe. */
   currentFile: string | null;
 }
 
@@ -71,9 +66,6 @@ export function listSlots(): SlotWithFiles[] {
   return manifest.slots.map((slot) => {
     const files = listFilesForSlot(slot);
 
-    // Si un seul fichier est disponible pour ce slot (ex: image de bracket remplacée en
-    // externe par l'utilisateur), on le (re)copie automatiquement à chaque démarrage :
-    // pas besoin de le resélectionner à la main après l'avoir remplacé sur le disque.
     if ((slot.type === 'image' || slot.type === 'video') && files.length === 1) {
       selectFileForSlot(slot.id, files[0].path);
     }
@@ -86,11 +78,6 @@ export function listSlots(): SlotWithFiles[] {
   });
 }
 
-/**
- * Copie le fichier choisi par l'utilisateur dans remotion-template/public/selected/<slotId>.<ext>,
- * en remplaçant toute sélection précédente pour ce slot (y compris si l'extension a changé).
- * Retourne le chemin relatif (résolu ensuite via staticFile() côté Remotion) à stocker dans les props.
- */
 export function selectFileForSlot(slotId: string, sourcePath: string): string {
   fs.mkdirSync(SELECTED_ASSETS_DIR, {recursive: true});
 

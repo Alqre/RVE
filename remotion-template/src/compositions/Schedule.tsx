@@ -8,7 +8,6 @@ const MONTHS = [
 	'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER',
 ];
 
-/** "2026-07-20T19:30" (valeur d'un <input type="datetime-local">) -> "MONDAY 20 JULY / 19:30 CET". */
 function formatMatchDateTime(value: string): string {
 	const date = value ? new Date(value) : null;
 	if (!date || Number.isNaN(date.getTime())) return 'Date TBD';
@@ -20,7 +19,6 @@ function formatMatchDateTime(value: string): string {
 	return `${weekday} ${day} ${month} / ${hours}:${minutes} CET`;
 }
 
-/** Utilisé aussi bien pour formater que pour trier/griser : on ne parse la date qu'une fois. */
 function parseMatchDate(value: string): Date | null {
 	if (!value) return null;
 	const date = new Date(value);
@@ -60,9 +58,6 @@ const MatchRow: React.FC<{ match: UpcomingMatch; delay: number; frame: number; i
 export const Schedule: React.FC<MainSceneProps> = ({ teamA, teamB, match1, match2, match3, schedulePeriod, tournamentName }) => {
 	const frame = useCurrentFrame();
 
-	// Les matchs déjà passés (comparés à l'instant du rendu) descendent en bas de la
-	// liste et restent groupés/triés parmi eux ; ceux sans date renseignée sont
-	// considérés comme à venir (on ne peut pas savoir s'ils sont passés).
 	const now = Date.now();
 	const orderedMatches = [match1, match2, match3]
 		.map((match) => {

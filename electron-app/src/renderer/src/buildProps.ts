@@ -13,15 +13,8 @@ export function initialValues(slots: SlotWithFiles[]): SlotValues {
     if (slot.type === 'text' || slot.type === 'select' || slot.type === 'datetime') {
       values[slot.id] = DEFAULT_TEXT_VALUES[slot.id] ?? slot.options?.[0] ?? '';
     } else if (slot.files.length === 1) {
-      // Un seul fichier possible (ex: bracket) : auto-sélectionné côté main process,
-      // on peut se fier à currentFile sans risque de reprendre un choix périmé.
       values[slot.id] = slot.currentFile ? `selected/${slot.currentFile}` : '';
     } else {
-      // Plusieurs options possibles : on ne présume jamais d'un choix précédent au
-      // démarrage (même si public/selected garde un fichier d'une session passée),
-      // sinon l'aperçu peut afficher une image que le menu déroulant ne montre pas
-      // comme sélectionnée. On repart d'un placeholder vide tant que l'utilisateur
-      // n'a pas choisi explicitement dans cette session.
       values[slot.id] = '';
     }
   }
@@ -49,7 +42,6 @@ export function buildInputProps(slots: SlotWithFiles[], values: SlotValues): Rec
   return props;
 }
 
-/** Nombre de manches actives pour le format de match actuellement sélectionné. */
 export function activeGameCount(values: SlotValues): number {
   const format = (values.matchFormat as MatchFormat) ?? 'BO3';
   return GAMES_BY_FORMAT[format] ?? GAMES_BY_FORMAT.BO3;
@@ -60,16 +52,17 @@ export function isSlotVisible(slot: SlotWithFiles, values: SlotValues): boolean 
   return slot.gameNumber <= activeGameCount(values);
 }
 
-// Suffixes de variante de map (ex: "Coal Tower II.png") : le title-case générique
-// ci-dessous mettrait tout sauf la 1re lettre en minuscule ("II" -> "Ii"), donc ces
-// mots-là gardent leurs majuscules telles quelles.
+export type SlotGroup = 'matchInfo' | 'games' | 'schedule';
+
+export function slotGroup(slot: SlotWithFiles): SlotGroup | null {
+  if (slot.gameNumber !== undefined) return 'games';
+  if (slot.id === 'matchFormat' || slot.id === 'bracketImage') return null;
+  if (slot.id === 'schedulePeriod' || /^match\d/.test(slot.id)) return 'schedule';
+  return 'matchInfo';
+}
+
 const ROMAN_NUMERAL = /^(I|II|III|IV|V|VI|VII|VIII|IX|X)$/i;
 
-/**
- * Déduit un nom lisible à partir d'un nom de fichier (ex: "Dark lord.png" -> "Dark Lord",
- * "team-alpha.svg" -> "Team Alpha"), pour pré-remplir automatiquement le champ texte lié
- * à un slot image/vidéo (logo, killer, map, caster...) sans que l'utilisateur ait à le taper.
- */
 export function deriveNameFromFile(fileName: string): string {
   const withoutExt = fileName.replace(/\.[^.]+$/, '');
   const spaced = withoutExt.replace(/[_-]+/g, ' ').trim();

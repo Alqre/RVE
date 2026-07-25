@@ -1,9 +1,5 @@
 import {z} from 'zod';
 
-/**
- * Un "slot" = un emplacement dont le contenu est choisi par l'utilisateur final
- * (logo, nom d'équipe, killer, map...) mais dont l'animation est figée par l'auteur.
- */
 export const teamSlotSchema = z.object({
   logoSrc: z.string(),
   teamName: z.string(),
@@ -24,23 +20,16 @@ export const gameSlotSchema = z.object({
 export const matchFormatSchema = z.enum(['BO3', 'BO5', 'BO7']);
 export type MatchFormat = z.infer<typeof matchFormatSchema>;
 
-/** Nombre de manches (donc de paires killer+map) pour chaque format de match. */
 export const GAMES_BY_FORMAT: Record<MatchFormat, number> = {
   BO3: 3,
   BO5: 5,
   BO7: 7,
 };
 
-/**
- * Durée (en frames @30fps) de la sous-scène Planning selon le format : plus de games
- * à montrer en carrousel pour BO5/BO7 (voir Planning.tsx) demande plus de temps.
- * Défini ici (pas dans MainScene.tsx) pour que MainScene.tsx et Planning.tsx puissent
- * tous les deux l'importer sans dépendance circulaire entre les deux fichiers.
- */
 export const PLANNING_DURATION_BY_FORMAT: Record<MatchFormat, number> = {
-  BO3: 600, // 20s @ 30fps
-  BO5: 900, // 30s @ 30fps
-  BO7: 1200, // 40s @ 30fps
+  BO3: 600,
+  BO5: 900,
+  BO7: 1200,
 };
 
 export function getPlanningDuration(matchFormat: MatchFormat): number {

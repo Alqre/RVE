@@ -4,23 +4,13 @@ directories:
   output: release-clean
   buildResources: build-resources
 
-# esbuild (utilisé par @remotion/bundler à chaque export) et les autres outils qui
-# spawnent leur propre binaire natif ne fonctionnent pas correctement une fois
-# packés dans l'archive virtuelle app.asar (résolution de chemin cassée -> crash
-# "service is no longer running" à l'export). Le plus simple et le plus robuste
-# est de ne pas utiliser asar du tout pour cette appli.
 asar: false
+npmRebuild: false
 
 files:
   - out/**/*
   - package.json
 
-# remotion-template et node_modules sont le "moteur" : on les copie dans resources/
-# (extraResources) au moment du packaging. @remotion/bundler rebundle le projet à
-# chaque export (voir render.ts), il lui faut donc les sources + les dépendances Node
-# réelles, pas seulement un bundle figé. Comme node_modules est hissé à la racine du
-# workspace, on le copie aussi pour préserver la résolution de modules
-# (remotion-template/src/* retrouve node_modules en remontant, comme en dev).
 extraResources:
   - from: ../remotion-template
     to: remotion-template
@@ -29,21 +19,19 @@ extraResources:
       - '!node_modules'
       - '!out'
       - '!build'
-  - from: ../node_modules
+  - from: release-deps/node_modules
     to: node_modules
-  # icon.png sert de fichier disponible à l'exécution pour l'icône de fenêtre
-  # (voir main/index.ts) ; l'icône du .exe/installeur est générée à part par
-  # electron-builder à partir de build-resources/icon.png (convention par défaut).
   - from: build-resources/icon.png
     to: icon.png
 
-# assets/ est la bibliothèque de contenu éditable par l'utilisateur final (logos,
-# killers, maps, bracket...). Contrairement à ce qui précède, elle doit rester à côté
-# du .exe (extraFiles, pas extraResources) pour que l'utilisateur puisse y ajouter ou
-# remplacer des fichiers après installation sans jamais avoir à reconstruire l'appli.
 extraFiles:
   - from: ../assets
     to: assets
+
+publish:
+  provider: github
+  owner: Alqre
+  repo: RVE
 
 win:
   target: nsis

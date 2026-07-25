@@ -1,18 +1,13 @@
 import React from 'react';
-import { AbsoluteFill, Easing, Img, OffthreadVideo, interpolate, spring, useCurrentFrame, useVideoConfig, staticFile } from 'remotion';
+import { AbsoluteFill, Easing, Img, OffthreadVideo, interpolate, useCurrentFrame, staticFile } from 'remotion';
 import type { MainSceneProps } from '../schema';
 
-// Glow léger propre à certaines équipes (couleur demandée par équipe), appliqué via
-// drop-shadow (suit la silhouette du logo, contrairement à box-shadow qui suivrait le
-// cadre rectangulaire du PNG transparent).
 const TEAM_GLOW_COLORS: Record<string, string> = {
 	sinners: 'rgba(168, 85, 247, 0.35)',
 	elysium: 'rgba(59, 130, 246, 0.55)',
 	oboy: 'rgba(235, 54, 54, 0.55)',
 };
 
-// Toute équipe sans couleur dédiée reçoit une ombre noire légère par défaut, plutôt
-// que pas de glow du tout.
 const DEFAULT_GLOW_COLOR = 'rgba(0, 0, 0, 0.55)';
 
 const Logo: React.FC<{ src: string; teamName?: string }> = ({ src, teamName }) => {
@@ -42,11 +37,8 @@ const CasterTag: React.FC<{ imageSrc: string; name: string }> = ({ imageSrc, nam
 
 export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, casterA, casterB }) => {
 	const frame = useCurrentFrame();
-	const { fps } = useVideoConfig();
 	const labelOpacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 	const fadeInOpacity = interpolate(frame, [0, 30, 570, 600], [1, 0, 0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-	// Se réduit sur l'axe X uniquement, ancré à droite (transformOrigin: 'right center')
-	// pendant la première seconde. Position/taille/valeurs à ajuster à la main.
 	const redRectScaleX = interpolate(frame, [0, 30], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp',easing: Easing.inOut(Easing.ease) });
 	const redRectScaleX_2 = interpolate(frame, [30, 60], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp',easing: Easing.inOut(Easing.ease) });
 	const logoOpacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
@@ -75,11 +67,11 @@ export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, cast
 					<div style={{ color: '#e7e3db', fontSize: 26, fontFamily: 'bebas kai', textAlign: 'center' }}>
 						{roundLabel || '—'}</div>
 				</div>
-				<div style={{ position: 'absolute', bottom: 69, left: 122.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5 }}>
+				<div style={{ position: 'absolute', bottom: 70.5, left: 122.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5 }}>
 					<CasterTag imageSrc={casterA.imageSrc} name={casterA.name} />
 					<span style={{ fontSize: 32, color: '#eb3636', fontFamily: 'bebas kai', opacity: textOpacity }}>{casterA.name || '—'}</span>
 				</div>
-				<div style={{ position: 'absolute', bottom: 69, left: 402.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5 }}>
+				<div style={{ position: 'absolute', bottom: 70.5, left: 402.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5 }}>
 					<CasterTag imageSrc={casterB.imageSrc} name={casterB.name} />
 					<span style={{ fontSize: 32, color: '#eb3636', fontFamily: 'bebas kai', opacity: textOpacity }}>{casterB.name || '—'}</span>
 				</div>

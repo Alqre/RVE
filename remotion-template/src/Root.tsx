@@ -8,9 +8,6 @@ export const RemotionRoot: React.FC = () => {
 		<Composition
 			id="MainScene"
 			component={MainScene}
-			// La durée totale dépend du format du match (voir getTotalDuration dans
-			// MainScene.tsx) : calculateMetadata la recalcule à partir des props actuelles
-			// plutôt que d'utiliser une constante figée.
 			calculateMetadata={({props}) => ({durationInFrames: getTotalDuration(props.matchFormat)})}
 			fps={30}
 			width={1920}
