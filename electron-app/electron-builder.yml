@@ -23,8 +23,10 @@ extraResources:
     to: node_modules
   - from: build-resources/icon.png
     to: icon.png
+
+extraFiles:
   - from: ../assets
-    to: assets-seed
+    to: assets
 
 publish:
   provider: github

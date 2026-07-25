@@ -78,15 +78,6 @@ export function listSlots(): SlotWithFiles[] {
   });
 }
 
-export function reconcileSelectedAssets(selectedSource: Record<string, string>): void {
-  for (const [slotId, sourcePath] of Object.entries(selectedSource)) {
-    if (!sourcePath || !fs.existsSync(sourcePath)) continue;
-    const alreadyPresent =
-      fs.existsSync(SELECTED_ASSETS_DIR) && fs.readdirSync(SELECTED_ASSETS_DIR).some((f) => path.parse(f).name === slotId);
-    if (!alreadyPresent) selectFileForSlot(slotId, sourcePath);
-  }
-}
-
 export function selectFileForSlot(slotId: string, sourcePath: string): string {
   fs.mkdirSync(SELECTED_ASSETS_DIR, {recursive: true});
 

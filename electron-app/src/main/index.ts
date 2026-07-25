@@ -4,9 +4,6 @@ import {registerAssetProtocolScheme, handleAssetProtocol} from './protocol';
 import {registerAppProtocolScheme, handleAppProtocol, APP_URL} from './appProtocol';
 import {registerIpcHandlers} from './ipc';
 import {initUpdater, checkForUpdates} from './updater';
-import {seedAssetsIfMissing} from './assetsSeed';
-import {reconcileSelectedAssets} from './assets';
-import {loadInputState} from './state';
 
 Menu.setApplicationMenu(null);
 
@@ -41,9 +38,6 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  seedAssetsIfMissing();
-  const savedState = loadInputState();
-  if (savedState) reconcileSelectedAssets(savedState.selectedSource);
   handleAssetProtocol();
   handleAppProtocol(path.join(__dirname, '../renderer'));
   registerIpcHandlers();

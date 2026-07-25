@@ -2,11 +2,7 @@ import {app} from 'electron';
 import path from 'node:path';
 
 export const ASSETS_DIR = app.isPackaged
-  ? path.join(app.getPath('userData'), 'assets')
-  : path.join(app.getAppPath(), '..', 'assets');
-
-export const SEED_ASSETS_DIR = app.isPackaged
-  ? path.join(process.resourcesPath, 'assets-seed')
+  ? path.join(path.dirname(app.getPath('exe')), 'assets')
   : path.join(app.getAppPath(), '..', 'assets');
 
 export const REMOTION_DIR = app.isPackaged
