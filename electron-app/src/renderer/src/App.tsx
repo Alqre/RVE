@@ -66,6 +66,7 @@ export const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [cancelled, setCancelled] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<UpdaterStatus | null>(null);
+  const [appVersion, setAppVersion] = useState<string | null>(null);
   const playerRef = useRef<PlayerRef | null>(null);
   const pendingFrameRef = useRef<number | null>(null);
   const exportStartRef = useRef<number | null>(null);
@@ -113,6 +114,10 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     return window.api.onUpdateStatus(setUpdateStatus);
+  }, []);
+
+  useEffect(() => {
+    window.api.getAppVersion().then(setAppVersion);
   }, []);
 
   useEffect(() => {
@@ -248,7 +253,7 @@ export const App: React.FC = () => {
   const updateDownloading = updateStatus?.state === 'downloading';
   const updateLabel =
     updateStatus?.state === 'available'
-      ? `Update available (v${updateStatus.version})`
+      ? 'Update'
       : updateStatus?.state === 'downloading'
         ? `Updating… ${Math.round(updateStatus.percent)}%`
         : 'Up to date';
@@ -268,6 +273,16 @@ export const App: React.FC = () => {
           </p>
         </div>
         <div className="app-header-actions">
+          {appVersion && (
+            <span className="app-version">
+              v{appVersion}
+              {updateStatus?.state === 'available' && (
+                <>
+                  , <span className="app-version-update">new version available v{updateStatus.version}</span>
+                </>
+              )}
+            </span>
+          )}
           <button
             className={`link-button update-button ${updateAvailable ? 'update-button-available' : ''}`}
             onClick={handleInstallUpdate}

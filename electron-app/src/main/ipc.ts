@@ -37,6 +37,8 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('updater:install', () => installUpdate());
 
+  ipcMain.handle('app:getVersion', () => app.getVersion());
+
   ipcMain.handle(
     'export:start',
     async (event, inputProps: Record<string, unknown>, format: ExportFormat, options: ExportOptions) => {

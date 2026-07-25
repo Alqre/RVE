@@ -18,6 +18,7 @@ export interface AppApi {
   saveState: (state: SavedInputState) => Promise<void>;
   installUpdate: () => Promise<void>;
   onUpdateStatus: (callback: (status: UpdaterStatus) => void) => () => void;
+  getAppVersion: () => Promise<string>;
 }
 
 const api: AppApi = {
@@ -41,6 +42,7 @@ const api: AppApi = {
     ipcRenderer.on('updater:status', listener);
     return () => ipcRenderer.removeListener('updater:status', listener);
   },
+  getAppVersion: () => ipcRenderer.invoke('app:getVersion'),
 };
 
 contextBridge.exposeInMainWorld('api', api);

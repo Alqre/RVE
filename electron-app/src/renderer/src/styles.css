@@ -81,7 +81,18 @@ body {
 
 .app-header-actions {
   display: flex;
+  align-items: center;
   gap: 10px;
+}
+
+.app-version {
+  font-size: 13px;
+  color: #666;
+}
+
+.app-version-update {
+  color: #24b862;
+  font-weight: 600;
 }
 
 .link-button {
