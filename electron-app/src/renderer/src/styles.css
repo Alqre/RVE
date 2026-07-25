@@ -108,6 +108,12 @@ body {
   border-color: #888;
 }
 
+.update-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .update-button:disabled {
   opacity: 0.4;
   cursor: default;
@@ -140,12 +146,6 @@ body {
 .discord-button:hover {
   background: #4752c4;
   border-color: #4752c4;
-}
-
-.update-installing-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #24b862;
 }
 
 .app-body {

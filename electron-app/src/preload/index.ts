@@ -16,7 +16,7 @@ export interface AppApi {
   onExportProgress: (callback: (progress: number) => void) => () => void;
   loadState: () => Promise<SavedInputState | null>;
   saveState: (state: SavedInputState) => Promise<void>;
-  installUpdate: () => Promise<void>;
+  openReleasesPage: () => Promise<void>;
   onUpdateStatus: (callback: (status: UpdaterStatus) => void) => () => void;
   getAppVersion: () => Promise<string>;
 }
@@ -36,7 +36,7 @@ const api: AppApi = {
   },
   loadState: () => ipcRenderer.invoke('state:load'),
   saveState: (state) => ipcRenderer.invoke('state:save', state),
-  installUpdate: () => ipcRenderer.invoke('updater:install'),
+  openReleasesPage: () => ipcRenderer.invoke('updater:openReleases'),
   onUpdateStatus: (callback) => {
     const listener = (_event: unknown, status: UpdaterStatus) => callback(status);
     ipcRenderer.on('updater:status', listener);

@@ -4,7 +4,6 @@ import {listSlots, selectFileForSlot} from './assets';
 import {exportVideo, cancelExport, type ExportFormat} from './render';
 import {ASSETS_DIR, OUTPUT_DIR} from './paths';
 import {loadInputState, saveInputState, type SavedInputState} from './state';
-import {installUpdate} from './updater';
 
 export interface ExportOptions {
   openFolderOnFinish: boolean;
@@ -35,7 +34,7 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle('state:save', (_event, state: SavedInputState) => saveInputState(state));
 
-  ipcMain.handle('updater:install', () => installUpdate());
+  ipcMain.handle('updater:openReleases', () => shell.openExternal('https://github.com/Alqre/RVE/releases/latest'));
 
   ipcMain.handle('app:getVersion', () => app.getVersion());
 
