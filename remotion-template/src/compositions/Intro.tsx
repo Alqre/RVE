@@ -10,6 +10,15 @@ const TEAM_GLOW_COLORS: Record<string, string> = {
 
 const DEFAULT_GLOW_COLOR = 'rgba(0, 0, 0, 0.55)';
 
+const GAME_WINDOW = { right: 127, bottom: 109, width: 416, height: 234 };
+const GAME_WINDOW_LEFT = 1920 - GAME_WINDOW.right - GAME_WINDOW.width;
+const GAME_WINDOW_TOP = 1080 - GAME_WINDOW.bottom - GAME_WINDOW.height;
+const GAME_WINDOW_BORDER_WIDTH = 3;
+const GAME_WINDOW_HOLE_GAP = 2;
+const GAME_WINDOW_HOLE_INSET = GAME_WINDOW_BORDER_WIDTH + GAME_WINDOW_HOLE_GAP;
+const WINDOW_PHASE_FRAMES = 300;
+const PHASE_FADE_FRAMES = 15;
+
 const Logo: React.FC<{ src: string; teamName?: string }> = ({ src, teamName }) => {
 	const glowColor = (teamName && TEAM_GLOW_COLORS[teamName.trim().toLowerCase()]) || DEFAULT_GLOW_COLOR;
 	return src ? (
@@ -35,14 +44,32 @@ const CasterTag: React.FC<{ imageSrc: string; name: string }> = ({ imageSrc, nam
 	)
 );
 
-export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, casterA, casterB }) => {
+export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, casterA, casterB, transparentIntro }) => {
 	const frame = useCurrentFrame();
 	const labelOpacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 	const fadeInOpacity = interpolate(frame, [0, 30, 570, 600], [1, 0, 0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 	const redRectScaleX = interpolate(frame, [0, 30], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp',easing: Easing.inOut(Easing.ease) });
 	const redRectScaleX_2 = interpolate(frame, [30, 60], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp',easing: Easing.inOut(Easing.ease) });
-	const logoOpacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-	const textOpacity = interpolate(frame, [30, 60], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+	const cyclePos = frame % (WINDOW_PHASE_FRAMES * 2);
+	const logoPhaseOpacity = interpolate(
+		cyclePos,
+		[0, PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES - PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES, WINDOW_PHASE_FRAMES * 2],
+		[0, 1, 1, 0, 0],
+		{ extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+	);
+	const windowPhaseOpacity = interpolate(
+		cyclePos,
+		[0, WINDOW_PHASE_FRAMES, WINDOW_PHASE_FRAMES + PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES * 2 - PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES * 2],
+		[0, 0, 1, 1, 0],
+		{ extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
+	);
+	const holeGrey = Math.round(255 * (1 - windowPhaseOpacity));
+	const logoOpacity = transparentIntro
+		? logoPhaseOpacity
+		: interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+	const textOpacity = transparentIntro
+		? logoPhaseOpacity
+		: interpolate(frame, [30, 60], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 	const bottompos = interpolate(frame, [0, 30], [0, 69], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
@@ -52,7 +79,23 @@ export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, cast
 	return (
 		<AbsoluteFill>
 			<AbsoluteFill style={{ zIndex: 0 }}>
-				<OffthreadVideo src={staticFile('video_file_remotion/scene1_bg.mp4')} loop style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+				{transparentIntro && (
+					<svg width="0" height="0" style={{ position: 'absolute' }}>
+						<mask id="gameWindowMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+							<rect x="0" y="0" width="1920" height="1080" fill="white" />
+							<rect
+								x={GAME_WINDOW_LEFT + GAME_WINDOW_HOLE_INSET}
+								y={GAME_WINDOW_TOP + GAME_WINDOW_HOLE_INSET}
+								width={GAME_WINDOW.width - GAME_WINDOW_HOLE_INSET * 2}
+								height={GAME_WINDOW.height - GAME_WINDOW_HOLE_INSET * 2}
+								fill={`rgb(${holeGrey}, ${holeGrey}, ${holeGrey})`}
+							/>
+						</mask>
+					</svg>
+				)}
+				<AbsoluteFill style={{ mask: transparentIntro ? 'url(#gameWindowMask)' : undefined, WebkitMask: transparentIntro ? 'url(#gameWindowMask)' : undefined }}>
+					<OffthreadVideo src={staticFile('video_file_remotion/scene1_bg.mp4')} loop style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+				</AbsoluteFill>
 			</AbsoluteFill>
 			<AbsoluteFill style={{ zIndex: 1 }}>
 				<div style={{ position: 'absolute', bottom: bottompos, right: 380, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5, opacity: logoOpacity }}>
@@ -63,9 +106,17 @@ export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, cast
 					<Logo src={teamB.logoSrc} teamName={teamB.teamName} />
 					<span style={{ fontSize: 32, color: '#eb3636', fontFamily: 'bebas kai', opacity: textOpacity }}>{teamB.teamName || '—'}</span>
 				</div>
-				<div style={{ position: 'absolute', bottom: 405, right: 200, left: 1450, opacity: labelOpacity }}>
-					<div style={{ color: '#e7e3db', fontSize: 26, fontFamily: 'bebas kai', textAlign: 'center' }}>
-						{roundLabel || '—'}</div>
+				<div style={{ position: 'absolute', bottom: 403, right: 200, left: 1450, textAlign: 'center', color: '#eb3636', fontSize: 24, fontFamily: 'bebas kai', letterSpacing: 1, opacity: labelOpacity }}>
+					{roundLabel || '—'}
+				</div>
+				<div style={{ position: 'absolute', bottom: 364, right: 200, left: 1450, textAlign: 'center', color: '#f5f2ec', fontSize: 32, fontFamily: 'bebas kai', letterSpacing: 2.5, whiteSpace: 'nowrap', opacity: labelOpacity * (transparentIntro ? logoPhaseOpacity : 1) }}>
+					CURRENT MATCH UP
+				</div>
+				<div style={{ position: 'absolute', bottom: 364, right: 200, left: 1450, textAlign: 'center', color: '#f5f2ec', fontSize: 32, fontFamily: 'bebas kai', letterSpacing: 2.5, whiteSpace: 'nowrap', opacity: labelOpacity * (transparentIntro ? windowPhaseOpacity : 0) }}>
+					MATCH IS BEING SET UP
+				</div>
+				<div style={{ position: 'absolute', bottom: 364, left: 122.5, width: 490, textAlign: 'center', color: '#e7e3db', fontSize: 32, fontFamily: 'bebas kai', letterSpacing: 2.5, opacity: labelOpacity }}>
+					YOUR CASTERS TODAY
 				</div>
 				<div style={{ position: 'absolute', bottom: 70.5, left: 122.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5 }}>
 					<CasterTag imageSrc={casterA.imageSrc} name={casterA.name} />
@@ -119,6 +170,19 @@ export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, cast
 						transform: `scaleX(${redRectScaleX_2})`,
 					}}
 				/>
+				{transparentIntro && (
+					<div
+						style={{
+							position: 'absolute',
+							right: GAME_WINDOW.right,
+							bottom: GAME_WINDOW.bottom,
+							width: GAME_WINDOW.width,
+							height: GAME_WINDOW.height,
+							border: `${GAME_WINDOW_BORDER_WIDTH}px solid #eb3636`,
+							opacity: windowPhaseOpacity,
+						}}
+					/>
+				)}
 			</AbsoluteFill>
 			<AbsoluteFill style={{ zIndex: 3, backgroundColor: '#000', opacity: fadeInOpacity }} />
 		</AbsoluteFill>

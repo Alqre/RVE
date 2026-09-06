@@ -79,12 +79,12 @@ export const Schedule: React.FC<MainSceneProps> = ({ teamA, teamB, match1, match
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
 	});
-	const leftpos_1 = interpolate(frame, [0, 80], [-600, -250], {
+	const leftpos_1 = interpolate(frame, [0, 80], [-600, -200], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
 	});
-	const leftpos_2 = interpolate(frame, [0, 60], [-300, 160], {
+	const leftpos_2 = interpolate(frame, [0, 60], [-300, 250], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
@@ -118,8 +118,8 @@ export const Schedule: React.FC<MainSceneProps> = ({ teamA, teamB, match1, match
 
 			</AbsoluteFill>
 			<AbsoluteFill style={{ zIndex: 2, flexDirection: 'row', opacity: opacity_out }}>
-				<Img src={staticFile('video_file_remotion/Legion.png')} style={{ width: '57%', position: 'absolute', left: leftpos_1, opacity: opacity_1 }} />
-				<Img src={staticFile('video_file_remotion/Pyramid.png')} style={{ width: '57%', position: 'absolute', left: leftpos_2, opacity: opacity_2 }} />
+				<Img src={staticFile('video_file_remotion/Killer1.png')} style={{ width: '50%', position: 'absolute', left: leftpos_1, opacity: opacity_1, filter: 'drop-shadow(0 10px 64px rgba(0, 0, 0, 0.45))' }} />
+				<Img src={staticFile('video_file_remotion/Killer2.png')} style={{ width: '50%', position: 'absolute', left: leftpos_2, opacity: opacity_2, filter: 'drop-shadow(0 10px 32px rgba(0, 0, 0, 0.45))' }} />
 			</AbsoluteFill>
 		</AbsoluteFill>
 	);

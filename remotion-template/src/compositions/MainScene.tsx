@@ -4,6 +4,7 @@ import type {MainSceneProps, MatchFormat} from '../schema';
 import {getPlanningDuration} from '../schema';
 import {Intro} from './Intro';
 import {Bracket} from './Bracket';
+import {Scoreboard} from './Scoreboard';
 import {Planning} from './Planning';
 import {Schedule} from './Schedule';
 
@@ -28,7 +29,7 @@ export const MainScene: React.FC<MainSceneProps> = (props) => {
 				<Schedule {...props} />
 			</Series.Sequence>
             <Series.Sequence durationInFrames={OTHER_SUB_SCENE_DURATION}>
-				<Bracket {...props} />
+				{props.bracketMode === 'Scoreboard' ? <Scoreboard {...props} /> : <Bracket {...props} />}
 			</Series.Sequence>
         </Series>
     );

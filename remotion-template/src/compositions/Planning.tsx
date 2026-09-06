@@ -33,6 +33,7 @@ const Logo: React.FC<{ src: string; teamName?: string }> = ({ src, teamName }) =
 
 const MATCH_FORMAT_LABELS: Record<MatchFormat, string> = {
 	BO3: 'Best of 3',
+	BO4: 'Best of 4',
 	BO5: 'Best of 5',
 	BO7: 'Best of 7',
 };
@@ -43,6 +44,7 @@ const Placeholder: React.FC<{ width: number; height: number }> = ({ width, heigh
 
 const FORMAT_LAYOUT: Record<MatchFormat, { scale: number; columnGap: number; carousel: boolean, TimeInFrames: number }> = {
 	BO3: { scale: 1.6, columnGap: 305, carousel: false, TimeInFrames: 600 },
+	BO4: { scale: 1.6, columnGap: 305, carousel: true, TimeInFrames: 750 },
 	BO5: { scale: 1.6, columnGap: 305, carousel: true, TimeInFrames: 900 },
 	BO7: { scale: 1.6, columnGap: 305, carousel: true, TimeInFrames: 1200 },
 };

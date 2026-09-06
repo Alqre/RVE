@@ -5,6 +5,7 @@ import type {MainSceneProps} from '../../../../remotion-template/src/schema';
 import type {ExportFormat} from '../../main/render';
 import type {UpdaterStatus} from '../../main/updater';
 import {SlotPicker} from './components/SlotPicker';
+import {StandingsRow} from './components/StandingsRow';
 import {PreviewPlayer} from './components/PreviewPlayer';
 import {
   buildInputProps,
@@ -12,6 +13,9 @@ import {
   initialValues,
   isSlotVisible,
   slotGroup,
+  withComputedStandingsNames,
+  TEAMS_PER_DIVISION,
+  type DivisionTeamOption,
   type SlotGroup,
   type SlotValues,
 } from './buildProps';
@@ -24,10 +28,14 @@ const EXPORT_FORMATS: {value: ExportFormat; label: string}[] = [
 
 const EXPORT_CANCELLED_MESSAGE = 'EXPORT_CANCELLED';
 
+const STANDINGS_NAME_PATTERN = /^division(\d)Team(\d+)Name$/;
+const STANDINGS_STAT_PATTERN = /^division\dTeam\d+(Wins|Losses|Ties|Points)$/;
+
 const CLEAR_GROUPS: {group: SlotGroup; label: string}[] = [
   {group: 'matchInfo', label: 'Clear match info'},
   {group: 'games', label: 'Clear games'},
   {group: 'schedule', label: 'Clear schedule'},
+  {group: 'bracket', label: 'Clear standings'},
 ];
 
 function formatRemaining(ms: number): string {
@@ -43,7 +51,9 @@ function sectionStartLabel(slot: SlotWithFiles): string | null {
   if (slot.id === 'teamALogo') return 'Teams';
   if (slot.id === 'casterAImage') return 'Casters';
   if (slot.gameNumber !== undefined && slot.id === `killerGame${slot.gameNumber}`) return `Game ${slot.gameNumber}`;
-  if (slot.id === 'bracketImage') return 'Bracket';
+  if (slot.id === 'bracketMode') return 'Bracket / Scoreboard';
+  if (slot.id === 'division1Team1Name') return 'Division 1';
+  if (slot.id === 'division2Team1Name') return 'Division 2';
   if (slot.id === 'schedulePeriod') return 'Schedule — Period';
   if (slot.id === 'match1Team1') return 'Schedule — Match 1';
   if (slot.id === 'match2Team1') return 'Schedule — Match 2';
@@ -145,7 +155,7 @@ export const App: React.FC = () => {
   );
 
   const clearGroupSlotIds = useMemo(() => {
-    const result: Record<SlotGroup, string[]> = {matchInfo: [], games: [], schedule: []};
+    const result: Record<SlotGroup, string[]> = {matchInfo: [], games: [], schedule: [], bracket: []};
     for (const slot of visibleSlots) {
       const group = slotGroup(slot);
       if (group) result[group].push(slot.id);
@@ -154,14 +164,64 @@ export const App: React.FC = () => {
   }, [visibleSlots]);
 
   const allSlotsFilled = useMemo(
-    () => visibleSlots.every((slot) => (values[slot.id] ?? '').trim() !== ''),
+    () =>
+      visibleSlots.every((slot) => STANDINGS_NAME_PATTERN.test(slot.id) || (values[slot.id] ?? '').trim() !== ''),
     [visibleSlots, values],
   );
 
+  const divisionTeamFiles = useMemo((): [{name: string; path: string}[], {name: string; path: string}[]] => {
+    const filesForDivision = (division: number) => {
+      const nameSlot = (slots ?? []).find((s) => s.id === `division${division}Team1Name`);
+      if (!nameSlot) return [];
+      const byName = new Map<string, string>();
+      for (const file of nameSlot.files) {
+        const name = deriveNameFromFile(file.name);
+        if (!byName.has(name)) byName.set(name, file.path);
+      }
+      return Array.from(byName.entries())
+        .map(([name, path]) => ({name, path}))
+        .sort((a, b) => a.name.localeCompare(b.name, 'en', {sensitivity: 'base'}));
+    };
+    return [filesForDivision(1), filesForDivision(2)];
+  }, [slots]);
+
+  const [divisionTeamLogoSrcs, setDivisionTeamLogoSrcs] = useState<[string[], string[]]>([[], []]);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(
+      divisionTeamFiles.map((teams, divisionIndex) =>
+        Promise.all(
+          teams
+            .slice(0, TEAMS_PER_DIVISION)
+            .map((team, teamIndex) => window.api.selectFileForSlot(`division${divisionIndex + 1}Team${teamIndex + 1}Logo`, team.path)),
+        ),
+      ),
+    ).then(([division1LogoSrcs, division2LogoSrcs]) => {
+      if (!cancelled) setDivisionTeamLogoSrcs([division1LogoSrcs, division2LogoSrcs]);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [divisionTeamFiles]);
+
+  const divisionTeamOptions = useMemo((): [DivisionTeamOption[], DivisionTeamOption[]] => {
+    const build = (division: number): DivisionTeamOption[] =>
+      divisionTeamFiles[division]
+        .slice(0, TEAMS_PER_DIVISION)
+        .map((team, index) => ({
+          name: team.name,
+          logoSrc: divisionTeamLogoSrcs[division][index] ?? '',
+        }));
+    return [build(0), build(1)];
+  }, [divisionTeamFiles, divisionTeamLogoSrcs]);
+
   const inputProps = useMemo(() => {
     if (!slots) return null;
-    return buildInputProps(slots, values) as unknown as MainSceneProps;
-  }, [slots, values]);
+    const props = withComputedStandingsNames(buildInputProps(slots, values), divisionTeamOptions);
+    props.transparentIntro = exportFormat === 'webm';
+    return props as unknown as MainSceneProps;
+  }, [slots, values, divisionTeamOptions, exportFormat]);
 
   const handlePickFile = async (slotId: string, sourcePath: string) => {
     const relativePath = await window.api.selectFileForSlot(slotId, sourcePath);
@@ -324,18 +384,35 @@ export const App: React.FC = () => {
             })}
           </div>
           {visibleSlots.map((slot) => {
+            if (STANDINGS_STAT_PATTERN.test(slot.id)) return null;
+
             const sectionLabel = sectionStartLabel(slot);
+            const standingsMatch = STANDINGS_NAME_PATTERN.exec(slot.id);
+
             return (
               <React.Fragment key={slot.id}>
                 {sectionLabel && <h2 className="slot-section-title">{sectionLabel}</h2>}
-                <SlotPicker
-                  slot={slot}
-                  value={values[slot.id] ?? ''}
-                  selectedSourcePath={selectedSource[slot.id]}
-                  onPickFile={handlePickFile}
-                  onTextChange={handleTextChange}
-                  onClear={handleClearSlot}
-                />
+                {standingsMatch ? (
+                  <StandingsRow
+                    rank={Number(standingsMatch[2])}
+                    name={divisionTeamOptions[Number(standingsMatch[1]) - 1][Number(standingsMatch[2]) - 1]?.name ?? ''}
+                    winsId={slot.id.replace('Name', 'Wins')}
+                    lossesId={slot.id.replace('Name', 'Losses')}
+                    tiesId={slot.id.replace('Name', 'Ties')}
+                    pointsId={slot.id.replace('Name', 'Points')}
+                    values={values}
+                    onTextChange={handleTextChange}
+                  />
+                ) : (
+                  <SlotPicker
+                    slot={slot}
+                    value={values[slot.id] ?? ''}
+                    selectedSourcePath={selectedSource[slot.id]}
+                    onPickFile={handlePickFile}
+                    onTextChange={handleTextChange}
+                    onClear={handleClearSlot}
+                  />
+                )}
               </React.Fragment>
             );
           })}

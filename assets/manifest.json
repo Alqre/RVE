@@ -12,12 +12,17 @@
       "type": "select",
       "label": "Match Format",
       "propPath": "matchFormat",
-      "options": ["BO3", "BO5", "BO7"]
+      "options": [
+        "BO3",
+        "BO4",
+        "BO5",
+        "BO7"
+      ]
     },
     {
       "id": "teamALogo",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Team A Logo",
       "propPath": "teamA.logoSrc",
       "linkedTextSlot": "teamAName"
@@ -31,7 +36,7 @@
     {
       "id": "teamBLogo",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Team B Logo",
       "propPath": "teamB.logoSrc",
       "linkedTextSlot": "teamBName"
@@ -311,7 +316,7 @@
     {
       "id": "match1Team1",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Match 1 — Team 1",
       "propPath": "match1.team1LogoSrc",
       "linkedTextSlot": "match1Team1Name"
@@ -325,7 +330,7 @@
     {
       "id": "match1Team2",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Match 1 — Team 2",
       "propPath": "match1.team2LogoSrc",
       "linkedTextSlot": "match1Team2Name"
@@ -345,7 +350,7 @@
     {
       "id": "match2Team1",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Match 2 — Team 1",
       "propPath": "match2.team1LogoSrc",
       "linkedTextSlot": "match2Team1Name"
@@ -359,7 +364,7 @@
     {
       "id": "match2Team2",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Match 2 — Team 2",
       "propPath": "match2.team2LogoSrc",
       "linkedTextSlot": "match2Team2Name"
@@ -379,7 +384,7 @@
     {
       "id": "match3Team1",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Match 3 — Team 1",
       "propPath": "match3.team1LogoSrc",
       "linkedTextSlot": "match3Team1Name"
@@ -393,7 +398,7 @@
     {
       "id": "match3Team2",
       "type": "image",
-      "folder": "logos",
+      "folder": "logos/Bracket",
       "label": "Match 3 — Team 2",
       "propPath": "match3.team2LogoSrc",
       "linkedTextSlot": "match3Team2Name"
@@ -411,11 +416,662 @@
       "propPath": "match3.date"
     },
     {
+      "id": "bracketMode",
+      "type": "select",
+      "label": "Bracket / Scoreboard",
+      "propPath": "bracketMode",
+      "options": [
+        "Bracket",
+        "Scoreboard"
+      ]
+    },
+    {
       "id": "bracketImage",
       "type": "image",
       "folder": "bracket",
       "label": "Bracket Image",
-      "propPath": "bracketImageSrc"
+      "propPath": "bracketImageSrc",
+      "bracketVariant": "bracket"
+    },
+    {
+      "id": "division1Team1Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 1 Name",
+      "propPath": "division1Team1.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team1Wins",
+      "type": "text",
+      "label": "Division 1 — Team 1 Wins",
+      "propPath": "division1Team1.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team1Losses",
+      "type": "text",
+      "label": "Division 1 — Team 1 Losses",
+      "propPath": "division1Team1.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team1Ties",
+      "type": "text",
+      "label": "Division 1 — Team 1 Ties",
+      "propPath": "division1Team1.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team1Points",
+      "type": "text",
+      "label": "Division 1 — Team 1 Points",
+      "propPath": "division1Team1.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team2Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 2 Name",
+      "propPath": "division1Team2.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team2Wins",
+      "type": "text",
+      "label": "Division 1 — Team 2 Wins",
+      "propPath": "division1Team2.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team2Losses",
+      "type": "text",
+      "label": "Division 1 — Team 2 Losses",
+      "propPath": "division1Team2.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team2Ties",
+      "type": "text",
+      "label": "Division 1 — Team 2 Ties",
+      "propPath": "division1Team2.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team2Points",
+      "type": "text",
+      "label": "Division 1 — Team 2 Points",
+      "propPath": "division1Team2.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team3Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 3 Name",
+      "propPath": "division1Team3.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team3Wins",
+      "type": "text",
+      "label": "Division 1 — Team 3 Wins",
+      "propPath": "division1Team3.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team3Losses",
+      "type": "text",
+      "label": "Division 1 — Team 3 Losses",
+      "propPath": "division1Team3.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team3Ties",
+      "type": "text",
+      "label": "Division 1 — Team 3 Ties",
+      "propPath": "division1Team3.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team3Points",
+      "type": "text",
+      "label": "Division 1 — Team 3 Points",
+      "propPath": "division1Team3.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team4Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 4 Name",
+      "propPath": "division1Team4.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team4Wins",
+      "type": "text",
+      "label": "Division 1 — Team 4 Wins",
+      "propPath": "division1Team4.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team4Losses",
+      "type": "text",
+      "label": "Division 1 — Team 4 Losses",
+      "propPath": "division1Team4.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team4Ties",
+      "type": "text",
+      "label": "Division 1 — Team 4 Ties",
+      "propPath": "division1Team4.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team4Points",
+      "type": "text",
+      "label": "Division 1 — Team 4 Points",
+      "propPath": "division1Team4.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team5Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 5 Name",
+      "propPath": "division1Team5.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team5Wins",
+      "type": "text",
+      "label": "Division 1 — Team 5 Wins",
+      "propPath": "division1Team5.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team5Losses",
+      "type": "text",
+      "label": "Division 1 — Team 5 Losses",
+      "propPath": "division1Team5.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team5Ties",
+      "type": "text",
+      "label": "Division 1 — Team 5 Ties",
+      "propPath": "division1Team5.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team5Points",
+      "type": "text",
+      "label": "Division 1 — Team 5 Points",
+      "propPath": "division1Team5.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team6Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 6 Name",
+      "propPath": "division1Team6.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team6Wins",
+      "type": "text",
+      "label": "Division 1 — Team 6 Wins",
+      "propPath": "division1Team6.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team6Losses",
+      "type": "text",
+      "label": "Division 1 — Team 6 Losses",
+      "propPath": "division1Team6.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team6Ties",
+      "type": "text",
+      "label": "Division 1 — Team 6 Ties",
+      "propPath": "division1Team6.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team6Points",
+      "type": "text",
+      "label": "Division 1 — Team 6 Points",
+      "propPath": "division1Team6.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team7Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 7 Name",
+      "propPath": "division1Team7.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team7Wins",
+      "type": "text",
+      "label": "Division 1 — Team 7 Wins",
+      "propPath": "division1Team7.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team7Losses",
+      "type": "text",
+      "label": "Division 1 — Team 7 Losses",
+      "propPath": "division1Team7.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team7Ties",
+      "type": "text",
+      "label": "Division 1 — Team 7 Ties",
+      "propPath": "division1Team7.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team7Points",
+      "type": "text",
+      "label": "Division 1 — Team 7 Points",
+      "propPath": "division1Team7.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team8Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 1",
+      "label": "Division 1 — Team 8 Name",
+      "propPath": "division1Team8.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team8Wins",
+      "type": "text",
+      "label": "Division 1 — Team 8 Wins",
+      "propPath": "division1Team8.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team8Losses",
+      "type": "text",
+      "label": "Division 1 — Team 8 Losses",
+      "propPath": "division1Team8.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team8Ties",
+      "type": "text",
+      "label": "Division 1 — Team 8 Ties",
+      "propPath": "division1Team8.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division1Team8Points",
+      "type": "text",
+      "label": "Division 1 — Team 8 Points",
+      "propPath": "division1Team8.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team1Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 1 Name",
+      "propPath": "division2Team1.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team1Wins",
+      "type": "text",
+      "label": "Division 2 — Team 1 Wins",
+      "propPath": "division2Team1.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team1Losses",
+      "type": "text",
+      "label": "Division 2 — Team 1 Losses",
+      "propPath": "division2Team1.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team1Ties",
+      "type": "text",
+      "label": "Division 2 — Team 1 Ties",
+      "propPath": "division2Team1.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team1Points",
+      "type": "text",
+      "label": "Division 2 — Team 1 Points",
+      "propPath": "division2Team1.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team2Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 2 Name",
+      "propPath": "division2Team2.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team2Wins",
+      "type": "text",
+      "label": "Division 2 — Team 2 Wins",
+      "propPath": "division2Team2.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team2Losses",
+      "type": "text",
+      "label": "Division 2 — Team 2 Losses",
+      "propPath": "division2Team2.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team2Ties",
+      "type": "text",
+      "label": "Division 2 — Team 2 Ties",
+      "propPath": "division2Team2.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team2Points",
+      "type": "text",
+      "label": "Division 2 — Team 2 Points",
+      "propPath": "division2Team2.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team3Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 3 Name",
+      "propPath": "division2Team3.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team3Wins",
+      "type": "text",
+      "label": "Division 2 — Team 3 Wins",
+      "propPath": "division2Team3.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team3Losses",
+      "type": "text",
+      "label": "Division 2 — Team 3 Losses",
+      "propPath": "division2Team3.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team3Ties",
+      "type": "text",
+      "label": "Division 2 — Team 3 Ties",
+      "propPath": "division2Team3.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team3Points",
+      "type": "text",
+      "label": "Division 2 — Team 3 Points",
+      "propPath": "division2Team3.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team4Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 4 Name",
+      "propPath": "division2Team4.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team4Wins",
+      "type": "text",
+      "label": "Division 2 — Team 4 Wins",
+      "propPath": "division2Team4.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team4Losses",
+      "type": "text",
+      "label": "Division 2 — Team 4 Losses",
+      "propPath": "division2Team4.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team4Ties",
+      "type": "text",
+      "label": "Division 2 — Team 4 Ties",
+      "propPath": "division2Team4.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team4Points",
+      "type": "text",
+      "label": "Division 2 — Team 4 Points",
+      "propPath": "division2Team4.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team5Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 5 Name",
+      "propPath": "division2Team5.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team5Wins",
+      "type": "text",
+      "label": "Division 2 — Team 5 Wins",
+      "propPath": "division2Team5.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team5Losses",
+      "type": "text",
+      "label": "Division 2 — Team 5 Losses",
+      "propPath": "division2Team5.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team5Ties",
+      "type": "text",
+      "label": "Division 2 — Team 5 Ties",
+      "propPath": "division2Team5.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team5Points",
+      "type": "text",
+      "label": "Division 2 — Team 5 Points",
+      "propPath": "division2Team5.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team6Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 6 Name",
+      "propPath": "division2Team6.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team6Wins",
+      "type": "text",
+      "label": "Division 2 — Team 6 Wins",
+      "propPath": "division2Team6.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team6Losses",
+      "type": "text",
+      "label": "Division 2 — Team 6 Losses",
+      "propPath": "division2Team6.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team6Ties",
+      "type": "text",
+      "label": "Division 2 — Team 6 Ties",
+      "propPath": "division2Team6.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team6Points",
+      "type": "text",
+      "label": "Division 2 — Team 6 Points",
+      "propPath": "division2Team6.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team7Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 7 Name",
+      "propPath": "division2Team7.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team7Wins",
+      "type": "text",
+      "label": "Division 2 — Team 7 Wins",
+      "propPath": "division2Team7.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team7Losses",
+      "type": "text",
+      "label": "Division 2 — Team 7 Losses",
+      "propPath": "division2Team7.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team7Ties",
+      "type": "text",
+      "label": "Division 2 — Team 7 Ties",
+      "propPath": "division2Team7.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team7Points",
+      "type": "text",
+      "label": "Division 2 — Team 7 Points",
+      "propPath": "division2Team7.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team8Name",
+      "type": "nameSelect",
+      "folder": "logos/Standings/Division 2",
+      "label": "Division 2 — Team 8 Name",
+      "propPath": "division2Team8.teamName",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team8Wins",
+      "type": "text",
+      "label": "Division 2 — Team 8 Wins",
+      "propPath": "division2Team8.wins",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team8Losses",
+      "type": "text",
+      "label": "Division 2 — Team 8 Losses",
+      "propPath": "division2Team8.losses",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team8Ties",
+      "type": "text",
+      "label": "Division 2 — Team 8 Ties",
+      "propPath": "division2Team8.ties",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
+    },
+    {
+      "id": "division2Team8Points",
+      "type": "text",
+      "label": "Division 2 — Team 8 Points",
+      "propPath": "division2Team8.points",
+      "placeholder": "0",
+      "bracketVariant": "scoreboard"
     }
   ]
 }

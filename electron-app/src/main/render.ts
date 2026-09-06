@@ -43,11 +43,12 @@ export async function exportVideo(
 
   try {
     const serveUrl = await getServeUrl();
+    const finalInputProps = {...inputProps, transparentIntro: format === 'webm'};
 
     const composition = await selectComposition({
       serveUrl,
       id: COMPOSITION_ID,
-      inputProps,
+      inputProps: finalInputProps,
     });
 
     fs.mkdirSync(OUTPUT_DIR, {recursive: true});
@@ -57,23 +58,29 @@ export async function exportVideo(
       composition,
       serveUrl,
       codec: format === 'webm' ? 'vp9' : 'h264',
-      pixelFormat: 'yuv420p',
+      pixelFormat: format === 'webm' ? 'yuva420p' : 'yuv420p',
+      imageFormat: format === 'webm' ? 'png' : 'jpeg',
       outputLocation: outputPath,
-      inputProps,
+      inputProps: finalInputProps,
       cancelSignal,
       onProgress: ({progress}) => onProgress(progress),
-      jpegQuality: 100,
+      ...(format === 'webm' ? {} : {jpegQuality: 100}),
       ffmpegOverride: ({args}) => {
         const codecIndex = args.indexOf('-c:v');
         const videoCodec = codecIndex !== -1 ? args[codecIndex + 1] : null;
         if (videoCodec !== 'libx264' && videoCodec !== 'libvpx-vp9') return args;
         const outputIndex = args.length - 1;
+        const colorTagArgs =
+          videoCodec === 'libvpx-vp9'
+            ? ['-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709']
+            : [];
         return [
           ...args.slice(0, outputIndex),
           '-vf',
           'scale=in_range=full:out_range=limited',
           '-color_range',
           'tv',
+          ...colorTagArgs,
           ...args.slice(outputIndex),
         ];
       },

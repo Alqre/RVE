@@ -3,7 +3,7 @@ import path from 'node:path';
 import {ASSETS_DIR, SELECTED_ASSETS_DIR} from './paths';
 import {toAssetUrl} from './protocol';
 
-export type SlotType = 'image' | 'video' | 'text' | 'select' | 'datetime';
+export type SlotType = 'image' | 'video' | 'text' | 'select' | 'datetime' | 'nameSelect';
 
 export interface ManifestSlot {
   id: string;
@@ -15,6 +15,7 @@ export interface ManifestSlot {
   linkedTextSlot?: string;
   options?: string[];
   gameNumber?: number;
+  bracketVariant?: 'bracket' | 'scoreboard';
 }
 
 interface ManifestFile {
@@ -44,7 +45,7 @@ function listFilesForSlot(slot: ManifestSlot): AssetFile[] {
   if (!slot.folder) return [];
   const dir = path.join(ASSETS_DIR, slot.folder);
   if (!fs.existsSync(dir)) return [];
-  const exts = slot.type === 'image' ? IMAGE_EXT : VIDEO_EXT;
+  const exts = slot.type === 'image' || slot.type === 'nameSelect' ? IMAGE_EXT : VIDEO_EXT;
   return fs
     .readdirSync(dir)
     .filter((f) => exts.has(path.extname(f).toLowerCase()))

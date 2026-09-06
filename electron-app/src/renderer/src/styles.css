@@ -333,6 +333,47 @@ body {
   border-color: #fe2d2d;
 }
 
+.standings-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.standings-row-index {
+  width: 20px;
+  flex-shrink: 0;
+  color: #999;
+  font-size: 13px;
+  text-align: right;
+}
+
+.standings-row-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #f0f0f2;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.standings-row-name-empty {
+  color: #5c5c66;
+}
+
+.standings-stat-input {
+  width: 44px;
+  flex-shrink: 0;
+  background: #24242c;
+  border: 1px solid #3a3a45;
+  color: #f0f0f2;
+  padding: 8px 6px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
 .fill-status {
   font-size: 14px;
   font-weight: 600;
