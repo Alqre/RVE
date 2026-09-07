@@ -158,7 +158,8 @@ const CarouselRow: React.FC<{
 	teamA: TeamInfo;
 	teamB: TeamInfo;
 	durationInFrames: number;
-}> = ({ games, frame, scale, columnGap, teamA, teamB, durationInFrames }) => {
+	matchFormat: MatchFormat;
+}> = ({ games, frame, scale, columnGap, teamA, teamB, durationInFrames, matchFormat }) => {
 	const columnWidth = 160 * scale;
 	const step = columnWidth + columnGap;
 	const firstGameCenteredOffset = CAROUSEL_VIEWPORT_WIDTH / 2 - columnWidth / 2;
@@ -207,7 +208,7 @@ const CarouselRow: React.FC<{
 		>
 			<div style={{ display: 'flex', gap: columnGap, transform: `translateX(${offset}px)` }}>
 				{games.map((game, index) => {
-					const isTiebreaker = index === games.length - 1;
+					const isTiebreaker = matchFormat !== 'BO4' && index === games.length - 1;
 					const picker = index % 2 === 0 ? teamA : teamB;
 					return (
 						<GameColumn
@@ -315,11 +316,12 @@ export const Planning: React.FC<MainSceneProps> = (props) => {
 							teamA={teamA}
 							teamB={teamB}
 							durationInFrames={durationInFrames}
+							matchFormat={matchFormat}
 						/>
 					) : (
 						<div style={{ display: 'flex', gap: layout.columnGap }}>
 							{activeGames.map((game, index) => {
-								const isTiebreaker = index === activeGames.length - 1;
+								const isTiebreaker = matchFormat !== 'BO4' && index === activeGames.length - 1;
 								const picker = index % 2 === 0 ? teamA : teamB;
 								return (
 									<GameColumn
