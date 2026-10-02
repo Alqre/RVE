@@ -8,6 +8,13 @@
       "placeholder": "Ex. Invitational Tournament, Season 1..."
     },
     {
+      "id": "leagueLogo",
+      "type": "image",
+      "folder": "league",
+      "label": "League Logo",
+      "propPath": "leagueLogoSrc"
+    },
+    {
       "id": "matchFormat",
       "type": "select",
       "label": "Match Format",

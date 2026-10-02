@@ -86,7 +86,7 @@ export type SlotGroup = 'matchInfo' | 'games' | 'schedule' | 'bracket';
 
 export function slotGroup(slot: SlotWithFiles): SlotGroup | null {
   if (slot.gameNumber !== undefined) return 'games';
-  if (slot.id === 'matchFormat' || slot.id === 'bracketMode' || slot.bracketVariant === 'bracket') return null;
+  if (slot.id === 'matchFormat' || slot.id === 'bracketMode' || slot.id === 'leagueLogo' || slot.bracketVariant === 'bracket') return null;
   if (slot.bracketVariant === 'scoreboard') return 'bracket';
   if (slot.id === 'schedulePeriod' || /^match\d/.test(slot.id)) return 'schedule';
   return 'matchInfo';

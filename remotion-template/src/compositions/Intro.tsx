@@ -44,7 +44,7 @@ const CasterTag: React.FC<{ imageSrc: string; name: string }> = ({ imageSrc, nam
 	)
 );
 
-export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, casterA, casterB, transparentIntro }) => {
+export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, casterA, casterB, leagueLogoSrc, transparentIntro }) => {
 	const frame = useCurrentFrame();
 	const labelOpacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 	const fadeInOpacity = interpolate(frame, [0, 30, 570, 600], [1, 0, 0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
@@ -118,6 +118,14 @@ export const Intro: React.FC<MainSceneProps> = ({ teamA, teamB, roundLabel, cast
 				<div style={{ position: 'absolute', bottom: 364, left: 122.5, width: 490, textAlign: 'center', color: '#e7e3db', fontSize: 32, fontFamily: 'bebas kai', letterSpacing: 2.5, opacity: labelOpacity }}>
 					YOUR CASTERS TODAY
 				</div>
+				{leagueLogoSrc ? (
+					<Img
+						src={staticFile(leagueLogoSrc)}
+						style={{ position: 'absolute', bottom: 155, left: 900, width: 120, height: 120, objectFit: 'contain', opacity: labelOpacity }}
+					/>
+				) : (
+					<div style={{ position: 'absolute', bottom: 155, left: 900, width: 120, height: 120, border: '3px dashed #444', borderRadius: 16, opacity: labelOpacity }} />
+				)}
 				<div style={{ position: 'absolute', bottom: 70.5, left: 122.5, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 17.5 }}>
 					<CasterTag imageSrc={casterA.imageSrc} name={casterA.name} />
 					<span style={{ fontSize: 32, color: '#eb3636', fontFamily: 'bebas kai', opacity: textOpacity }}>{casterA.name || '—'}</span>
