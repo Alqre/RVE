@@ -1,9 +1,16 @@
 import React from 'react';
 import { AbsoluteFill, Img, interpolate, useCurrentFrame, staticFile, Easing } from 'remotion';
-import type { MainSceneProps, StandingsTeam } from '../schema';
+import type { MainSceneProps, ScoreboardBoardKey, StandingsTeam } from '../schema';
+import { getScoreboardSceneDuration, SCOREBOARD_BOARDS, selectedScoreboardBoards } from '../schema';
 
-const WINDOW_PHASE_FRAMES = 300;
 const PHASE_FADE_FRAMES = 15;
+
+const BOARD_STYLES: Record<ScoreboardBoardKey, { title: string; accentColor: string }> = {
+	division1: { title: 'DIVISION 1', accentColor: '#eb3636' },
+	division2: { title: 'DIVISION 2', accentColor: '#e7e3db' },
+	apac: { title: 'APAC', accentColor: '#eb3636' },
+	oce: { title: 'OCE', accentColor: '#e7e3db' },
+};
 const COLUMN_WIDTHS = { rank: 60, record: 260, points: 100 };
 
 function sortStandings(teams: StandingsTeam[]): StandingsTeam[] {
@@ -94,7 +101,7 @@ const DivisionTable: React.FC<{ title: string; teams: StandingsTeam[]; opacity: 
 }) => {
 	const sorted = sortStandings(teams);
 	return (
-		<div style={{ gridArea: '1 / 1', width: 1300, opacity, position: 'relative' }}>
+		<div style={{ gridArea: '1 / 1', alignSelf: 'center', width: 1300, opacity, position: 'relative' }}>
 			<p
 				style={{
 					position: 'absolute',
@@ -129,48 +136,28 @@ const DivisionTable: React.FC<{ title: string; teams: StandingsTeam[]; opacity: 
 
 export const Scoreboard: React.FC<MainSceneProps> = (props) => {
 	const frame = useCurrentFrame();
+	const boards = selectedScoreboardBoards(props.scoreboardBoards);
+	const sceneDuration = getScoreboardSceneDuration('Scoreboard', props.scoreboardBoards);
+	const phaseFrames = sceneDuration / boards.length;
 	const opacity = interpolate(frame, [0, 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-	const fadeInOpacity = interpolate(frame, [570, 600], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+	const fadeInOpacity = interpolate(frame, [sceneDuration - 30, sceneDuration], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 	const topPos = interpolate(frame, [0, 30], [40, 0], {
 		extrapolateLeft: 'clamp',
 		extrapolateRight: 'clamp',
 		easing: Easing.inOut(Easing.ease),
 	});
 
-	const cyclePos = frame % (WINDOW_PHASE_FRAMES * 2);
-	const division1Opacity = interpolate(
-		cyclePos,
-		[0, PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES - PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES, WINDOW_PHASE_FRAMES * 2],
-		[0, 1, 1, 0, 0],
-		{ extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
-	);
-	const division2Opacity = interpolate(
-		cyclePos,
-		[0, WINDOW_PHASE_FRAMES, WINDOW_PHASE_FRAMES + PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES * 2 - PHASE_FADE_FRAMES, WINDOW_PHASE_FRAMES * 2],
-		[0, 0, 1, 1, 0],
-		{ extrapolateLeft: 'clamp', extrapolateRight: 'clamp' },
-	);
+	const boardOpacity = (index: number) => {
+		const start = index * phaseFrames;
+		const end = start + phaseFrames;
+		return interpolate(frame, [start, start + PHASE_FADE_FRAMES, end - PHASE_FADE_FRAMES, end], [0, 1, 1, 0], {
+			extrapolateLeft: 'clamp',
+			extrapolateRight: 'clamp',
+		});
+	};
 
-	const division1Teams = [
-		props.division1Team1,
-		props.division1Team2,
-		props.division1Team3,
-		props.division1Team4,
-		props.division1Team5,
-		props.division1Team6,
-		props.division1Team7,
-		props.division1Team8,
-	];
-	const division2Teams = [
-		props.division2Team1,
-		props.division2Team2,
-		props.division2Team3,
-		props.division2Team4,
-		props.division2Team5,
-		props.division2Team6,
-		props.division2Team7,
-		props.division2Team8,
-	];
+	const boardTeams = (board: ScoreboardBoardKey): StandingsTeam[] =>
+		Array.from({ length: SCOREBOARD_BOARDS.find((b) => b.key === board)?.teamCount ?? 0 }, (_, index) => props[`${board}Team${index + 1}` as keyof MainSceneProps] as StandingsTeam);
 
 	return (
 		<AbsoluteFill>
@@ -180,13 +167,26 @@ export const Scoreboard: React.FC<MainSceneProps> = (props) => {
 			<AbsoluteFill style={{ justifyContent: 'center', alignItems: 'center', opacity, top: topPos }}>
 				<div style={{ position: 'relative', marginTop: 40 }}>
 					<div style={{ display: 'grid' }}>
-						<DivisionTable title="DIVISION 1" teams={division1Teams} opacity={division1Opacity} accentColor="#eb3636" />
-						<DivisionTable title="DIVISION 2" teams={division2Teams} opacity={division2Opacity} accentColor="#e7e3db" />
+						{boards.map((board, index) => (
+							<DivisionTable
+								key={board}
+								title={BOARD_STYLES[board].title}
+								teams={boardTeams(board)}
+								opacity={boardOpacity(index)}
+								accentColor={BOARD_STYLES[board].accentColor}
+							/>
+						))}
 					</div>
-					<div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 28, display: 'flex', justifyContent: 'center', gap: 16 }}>
-						<div style={{ width: 70, height: 10, borderRadius: 6, backgroundColor: '#eb3636', opacity: 0.25 + division1Opacity * 0.75 }} />
-						<div style={{ width: 70, height: 10, borderRadius: 6, backgroundColor: '#e7e3db', opacity: 0.25 + division2Opacity * 0.75 }} />
-					</div>
+					{boards.length > 1 && (
+						<div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 28, display: 'flex', justifyContent: 'center', gap: 16 }}>
+							{boards.map((board, index) => (
+								<div
+									key={board}
+									style={{ width: 70, height: 10, borderRadius: 6, backgroundColor: BOARD_STYLES[board].accentColor, opacity: 0.25 + boardOpacity(index) * 0.75 }}
+								/>
+							))}
+						</div>
+					)}
 				</div>
 			</AbsoluteFill>
 			<AbsoluteFill style={{ zIndex: 3, backgroundColor: '#000', opacity: fadeInOpacity }} />

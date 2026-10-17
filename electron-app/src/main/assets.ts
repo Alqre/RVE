@@ -3,7 +3,7 @@ import path from 'node:path';
 import {ASSETS_DIR, SELECTED_ASSETS_DIR} from './paths';
 import {toAssetUrl} from './protocol';
 
-export type SlotType = 'image' | 'video' | 'text' | 'select' | 'datetime' | 'nameSelect';
+export type SlotType = 'image' | 'video' | 'text' | 'select' | 'multiSelect' | 'datetime' | 'nameSelect';
 
 export interface ManifestSlot {
   id: string;
@@ -16,6 +16,7 @@ export interface ManifestSlot {
   options?: string[];
   gameNumber?: number;
   bracketVariant?: 'bracket' | 'scoreboard';
+  scoreboardBoard?: string;
 }
 
 interface ManifestFile {

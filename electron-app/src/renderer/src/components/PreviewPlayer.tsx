@@ -22,7 +22,7 @@ export const PreviewPlayer = forwardRef<PlayerRef, Props>(({inputProps}, ref) =>
         ref={ref}
         component={MainScene}
         inputProps={inputProps}
-        durationInFrames={getTotalDuration(inputProps.matchFormat)}
+        durationInFrames={getTotalDuration(inputProps)}
         fps={30}
         compositionWidth={1920}
         compositionHeight={1080}

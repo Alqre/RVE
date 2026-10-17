@@ -8,7 +8,7 @@ export const RemotionRoot: React.FC = () => {
 		<Composition
 			id="MainScene"
 			component={MainScene}
-			calculateMetadata={({props}) => ({durationInFrames: getTotalDuration(props.matchFormat)})}
+			calculateMetadata={({props}) => ({durationInFrames: getTotalDuration(props)})}
 			fps={30}
 			width={1920}
 			height={1080}

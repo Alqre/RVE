@@ -68,6 +68,39 @@ export const SlotPicker: React.FC<Props> = ({slot, value, selectedSourcePath, on
     );
   }
 
+  if (slot.type === 'multiSelect') {
+    const options = slot.options ?? [];
+    const selected = options.filter((option) => value.split(',').includes(option));
+    const toggle = (option: string) => {
+      const next = selected.includes(option)
+        ? selected.filter((s) => s !== option)
+        : options.filter((o) => o === option || selected.includes(o));
+      if (next.length === 0) return;
+      onTextChange(slot.id, next.join(','));
+    };
+    return (
+      <div className="slot">
+        <label className="slot-label">{slot.label}</label>
+        <div className="slot-checkboxes">
+          {options.map((option) => {
+            const checked = selected.includes(option);
+            return (
+              <label key={option} className="slot-checkbox">
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  disabled={checked && selected.length === 1}
+                  onChange={() => toggle(option)}
+                />
+                {option}
+              </label>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   if (slot.files.length === 0) {
     return (
       <div className="slot">

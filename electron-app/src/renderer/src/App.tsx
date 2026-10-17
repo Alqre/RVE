@@ -1,7 +1,11 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import type {PlayerRef} from '@remotion/player';
 import type {SlotWithFiles} from '../../main/assets';
-import type {MainSceneProps} from '../../../../remotion-template/src/schema';
+import {
+  SCOREBOARD_BOARDS,
+  type MainSceneProps,
+  type ScoreboardBoardKey,
+} from '../../../../remotion-template/src/schema';
 import type {ExportFormat} from '../../main/render';
 import type {UpdaterStatus} from '../../main/updater';
 import {SlotPicker} from './components/SlotPicker';
@@ -14,8 +18,7 @@ import {
   isSlotVisible,
   slotGroup,
   withComputedStandingsNames,
-  TEAMS_PER_DIVISION,
-  type DivisionTeamOption,
+  type BoardTeamOptions,
   type SlotGroup,
   type SlotValues,
 } from './buildProps';
@@ -28,8 +31,15 @@ const EXPORT_FORMATS: {value: ExportFormat; label: string}[] = [
 
 const EXPORT_CANCELLED_MESSAGE = 'EXPORT_CANCELLED';
 
-const STANDINGS_NAME_PATTERN = /^division(\d)Team(\d+)Name$/;
-const STANDINGS_STAT_PATTERN = /^division\dTeam\d+(Wins|Losses|Ties|Points)$/;
+const BOARD_KEYS_PATTERN = SCOREBOARD_BOARDS.map((board) => board.key).join('|');
+const STANDINGS_NAME_PATTERN = new RegExp(`^(${BOARD_KEYS_PATTERN})Team(\\d+)Name$`);
+const STANDINGS_STAT_PATTERN = new RegExp(`^(${BOARD_KEYS_PATTERN})Team\\d+(Wins|Losses|Ties|Points)$`);
+
+type TeamFile = {name: string; path: string};
+
+function emptyBoardRecord<T>(): Record<ScoreboardBoardKey, T[]> {
+  return Object.fromEntries(SCOREBOARD_BOARDS.map((board) => [board.key, []])) as unknown as Record<ScoreboardBoardKey, T[]>;
+}
 
 const CLEAR_GROUPS: {group: SlotGroup; label: string}[] = [
   {group: 'matchInfo', label: 'Clear match info'},
@@ -52,8 +62,8 @@ function sectionStartLabel(slot: SlotWithFiles): string | null {
   if (slot.id === 'casterAImage') return 'Casters';
   if (slot.gameNumber !== undefined && slot.id === `killerGame${slot.gameNumber}`) return `Game ${slot.gameNumber}`;
   if (slot.id === 'bracketMode') return 'Bracket / Scoreboard';
-  if (slot.id === 'division1Team1Name') return 'Division 1';
-  if (slot.id === 'division2Team1Name') return 'Division 2';
+  const board = SCOREBOARD_BOARDS.find((b) => slot.id === `${b.key}Team1Name`);
+  if (board) return board.label;
   if (slot.id === 'schedulePeriod') return 'Schedule — Period';
   if (slot.id === 'match1Team1') return 'Schedule — Match 1';
   if (slot.id === 'match2Team1') return 'Schedule — Match 2';
@@ -169,9 +179,9 @@ export const App: React.FC = () => {
     [visibleSlots, values],
   );
 
-  const divisionTeamFiles = useMemo((): [{name: string; path: string}[], {name: string; path: string}[]] => {
-    const filesForDivision = (division: number) => {
-      const nameSlot = (slots ?? []).find((s) => s.id === `division${division}Team1Name`);
+  const boardTeamFiles = useMemo(() => {
+    const filesForBoard = (board: (typeof SCOREBOARD_BOARDS)[number]): TeamFile[] => {
+      const nameSlot = (slots ?? []).find((s) => s.id === `${board.key}Team1Name`);
       if (!nameSlot) return [];
       const byName = new Map<string, string>();
       for (const file of nameSlot.files) {
@@ -180,48 +190,56 @@ export const App: React.FC = () => {
       }
       return Array.from(byName.entries())
         .map(([name, path]) => ({name, path}))
-        .sort((a, b) => a.name.localeCompare(b.name, 'en', {sensitivity: 'base'}));
+        .sort((a, b) => a.name.localeCompare(b.name, 'en', {sensitivity: 'base'}))
+        .slice(0, board.teamCount);
     };
-    return [filesForDivision(1), filesForDivision(2)];
+    const result = emptyBoardRecord<TeamFile>();
+    for (const board of SCOREBOARD_BOARDS) result[board.key] = filesForBoard(board);
+    return result;
   }, [slots]);
 
-  const [divisionTeamLogoSrcs, setDivisionTeamLogoSrcs] = useState<[string[], string[]]>([[], []]);
+  const [boardTeamLogoSrcs, setBoardTeamLogoSrcs] = useState(() => emptyBoardRecord<string>());
 
   useEffect(() => {
     let cancelled = false;
     Promise.all(
-      divisionTeamFiles.map((teams, divisionIndex) =>
+      SCOREBOARD_BOARDS.map((board) =>
         Promise.all(
-          teams
-            .slice(0, TEAMS_PER_DIVISION)
-            .map((team, teamIndex) => window.api.selectFileForSlot(`division${divisionIndex + 1}Team${teamIndex + 1}Logo`, team.path)),
+          boardTeamFiles[board.key].map((team, teamIndex) =>
+            window.api.selectFileForSlot(`${board.key}Team${teamIndex + 1}Logo`, team.path),
+          ),
         ),
       ),
-    ).then(([division1LogoSrcs, division2LogoSrcs]) => {
-      if (!cancelled) setDivisionTeamLogoSrcs([division1LogoSrcs, division2LogoSrcs]);
+    ).then((logoSrcsByBoard) => {
+      if (cancelled) return;
+      const next = emptyBoardRecord<string>();
+      SCOREBOARD_BOARDS.forEach((board, index) => {
+        next[board.key] = logoSrcsByBoard[index];
+      });
+      setBoardTeamLogoSrcs(next);
     });
     return () => {
       cancelled = true;
     };
-  }, [divisionTeamFiles]);
+  }, [boardTeamFiles]);
 
-  const divisionTeamOptions = useMemo((): [DivisionTeamOption[], DivisionTeamOption[]] => {
-    const build = (division: number): DivisionTeamOption[] =>
-      divisionTeamFiles[division]
-        .slice(0, TEAMS_PER_DIVISION)
-        .map((team, index) => ({
-          name: team.name,
-          logoSrc: divisionTeamLogoSrcs[division][index] ?? '',
-        }));
-    return [build(0), build(1)];
-  }, [divisionTeamFiles, divisionTeamLogoSrcs]);
+  const boardTeamOptions = useMemo((): BoardTeamOptions => {
+    const result = emptyBoardRecord<{name: string; logoSrc: string}>();
+    for (const board of SCOREBOARD_BOARDS) {
+      result[board.key] = boardTeamFiles[board.key].map((team, index) => ({
+        name: team.name,
+        logoSrc: boardTeamLogoSrcs[board.key][index] ?? '',
+      }));
+    }
+    return result;
+  }, [boardTeamFiles, boardTeamLogoSrcs]);
 
   const inputProps = useMemo(() => {
     if (!slots) return null;
-    const props = withComputedStandingsNames(buildInputProps(slots, values), divisionTeamOptions);
+    const props = withComputedStandingsNames(buildInputProps(slots, values), boardTeamOptions);
     props.transparentIntro = exportFormat === 'webm';
     return props as unknown as MainSceneProps;
-  }, [slots, values, divisionTeamOptions, exportFormat]);
+  }, [slots, values, boardTeamOptions, exportFormat]);
 
   const handlePickFile = async (slotId: string, sourcePath: string) => {
     const relativePath = await window.api.selectFileForSlot(slotId, sourcePath);
@@ -395,7 +413,7 @@ export const App: React.FC = () => {
                 {standingsMatch ? (
                   <StandingsRow
                     rank={Number(standingsMatch[2])}
-                    name={divisionTeamOptions[Number(standingsMatch[1]) - 1][Number(standingsMatch[2]) - 1]?.name ?? ''}
+                    name={boardTeamOptions[standingsMatch[1] as ScoreboardBoardKey][Number(standingsMatch[2]) - 1]?.name ?? ''}
                     winsId={slot.id.replace('Name', 'Wins')}
                     lossesId={slot.id.replace('Name', 'Losses')}
                     tiesId={slot.id.replace('Name', 'Ties')}

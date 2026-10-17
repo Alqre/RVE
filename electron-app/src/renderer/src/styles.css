@@ -316,6 +316,47 @@ body {
   color: #fe2d2d;
 }
 
+.slot-checkboxes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.slot-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #24242c;
+  border: 1px solid #3a3a45;
+  color: #ccc;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.slot-checkbox:hover {
+  border-color: #666;
+}
+
+.slot-checkbox:has(input:checked) {
+  border-color: #fe2d2d;
+  color: #fe2d2d;
+}
+
+.slot-checkbox input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: #fe2d2d;
+  cursor: pointer;
+}
+
+.slot-checkbox input:disabled {
+  cursor: not-allowed;
+}
+
 .slot-select {
   background: #24242c;
   border: 1px solid #3a3a45;

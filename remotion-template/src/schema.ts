@@ -49,6 +49,30 @@ export const upcomingMatchSchema = z.object({
 export const bracketModeSchema = z.enum(['Bracket', 'Scoreboard']);
 export type BracketMode = z.infer<typeof bracketModeSchema>;
 
+export const SCOREBOARD_BOARDS = [
+  {key: 'division1', label: 'Division 1', teamCount: 8},
+  {key: 'division2', label: 'Division 2', teamCount: 8},
+  {key: 'apac', label: 'APAC', teamCount: 4},
+  {key: 'oce', label: 'OCE', teamCount: 4},
+] as const;
+export type ScoreboardBoardKey = (typeof SCOREBOARD_BOARDS)[number]['key'];
+
+export const DEFAULT_SCOREBOARD_SELECTION = 'Division 1,Division 2';
+
+export function selectedScoreboardBoards(selection: string): ScoreboardBoardKey[] {
+  const labels = selection.split(',').map((label) => label.trim());
+  const keys = SCOREBOARD_BOARDS.filter((board) => labels.includes(board.label)).map((board) => board.key);
+  return keys.length > 0 ? keys : ['division1'];
+}
+
+export const SCOREBOARD_PHASE_FRAMES = 300;
+export const BRACKET_SCENE_DURATION = 600;
+
+export function getScoreboardSceneDuration(bracketMode: BracketMode, scoreboardBoards: string): number {
+  if (bracketMode !== 'Scoreboard') return BRACKET_SCENE_DURATION;
+  return Math.max(BRACKET_SCENE_DURATION, SCOREBOARD_PHASE_FRAMES * selectedScoreboardBoards(scoreboardBoards).length);
+}
+
 export const standingsTeamSchema = z.object({
   teamName: z.string(),
   logoSrc: z.string(),
@@ -117,6 +141,15 @@ export const mainSceneSchema = z.object({
   division2Team6: standingsTeamSchema,
   division2Team7: standingsTeamSchema,
   division2Team8: standingsTeamSchema,
+  apacTeam1: standingsTeamSchema,
+  apacTeam2: standingsTeamSchema,
+  apacTeam3: standingsTeamSchema,
+  apacTeam4: standingsTeamSchema,
+  oceTeam1: standingsTeamSchema,
+  oceTeam2: standingsTeamSchema,
+  oceTeam3: standingsTeamSchema,
+  oceTeam4: standingsTeamSchema,
+  scoreboardBoards: z.string(),
   schedulePeriod: z.string(),
   match1: upcomingMatchSchema,
   match2: upcomingMatchSchema,
@@ -170,6 +203,15 @@ export const defaultMainSceneProps: MainSceneProps = {
   division2Team6: emptyStandingsTeam,
   division2Team7: emptyStandingsTeam,
   division2Team8: emptyStandingsTeam,
+  apacTeam1: emptyStandingsTeam,
+  apacTeam2: emptyStandingsTeam,
+  apacTeam3: emptyStandingsTeam,
+  apacTeam4: emptyStandingsTeam,
+  oceTeam1: emptyStandingsTeam,
+  oceTeam2: emptyStandingsTeam,
+  oceTeam3: emptyStandingsTeam,
+  oceTeam4: emptyStandingsTeam,
+  scoreboardBoards: DEFAULT_SCOREBOARD_SELECTION,
   schedulePeriod: '',
   match1: emptyMatch,
   match2: emptyMatch,
