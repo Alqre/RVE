@@ -8,8 +8,8 @@ const PHASE_FADE_FRAMES = 15;
 const BOARD_STYLES: Record<ScoreboardBoardKey, { title: string; accentColor: string }> = {
 	division1: { title: 'DIVISION 1', accentColor: '#eb3636' },
 	division2: { title: 'DIVISION 2', accentColor: '#e7e3db' },
-	apac: { title: 'APAC', accentColor: '#eb3636' },
-	oce: { title: 'OCE', accentColor: '#e7e3db' },
+	apac: { title: 'APAC', accentColor: '#d18a5a' },
+	sa: { title: 'SA', accentColor: '#8cb5d6' },
 };
 const COLUMN_WIDTHS = { rank: 60, record: 260, points: 100 };
 

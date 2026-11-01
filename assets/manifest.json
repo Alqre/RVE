@@ -441,7 +441,7 @@
         "Division 1",
         "Division 2",
         "APAC",
-        "OCE"
+        "SA"
       ],
       "bracketVariant": "scoreboard"
     },
@@ -1354,184 +1354,184 @@
       "scoreboardBoard": "APAC"
     },
     {
-      "id": "oceTeam1Name",
+      "id": "saTeam1Name",
       "type": "nameSelect",
-      "folder": "logos/Standings/OCE",
-      "label": "OCE — Team 1 Name",
-      "propPath": "oceTeam1.teamName",
+      "folder": "logos/Standings/SA",
+      "label": "SA — Team 1 Name",
+      "propPath": "saTeam1.teamName",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam1Wins",
+      "id": "saTeam1Wins",
       "type": "text",
-      "label": "OCE — Team 1 Wins",
-      "propPath": "oceTeam1.wins",
+      "label": "SA — Team 1 Wins",
+      "propPath": "saTeam1.wins",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam1Losses",
+      "id": "saTeam1Losses",
       "type": "text",
-      "label": "OCE — Team 1 Losses",
-      "propPath": "oceTeam1.losses",
+      "label": "SA — Team 1 Losses",
+      "propPath": "saTeam1.losses",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam1Ties",
+      "id": "saTeam1Ties",
       "type": "text",
-      "label": "OCE — Team 1 Ties",
-      "propPath": "oceTeam1.ties",
+      "label": "SA — Team 1 Ties",
+      "propPath": "saTeam1.ties",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam1Points",
+      "id": "saTeam1Points",
       "type": "text",
-      "label": "OCE — Team 1 Points",
-      "propPath": "oceTeam1.points",
+      "label": "SA — Team 1 Points",
+      "propPath": "saTeam1.points",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam2Name",
+      "id": "saTeam2Name",
       "type": "nameSelect",
-      "folder": "logos/Standings/OCE",
-      "label": "OCE — Team 2 Name",
-      "propPath": "oceTeam2.teamName",
+      "folder": "logos/Standings/SA",
+      "label": "SA — Team 2 Name",
+      "propPath": "saTeam2.teamName",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam2Wins",
+      "id": "saTeam2Wins",
       "type": "text",
-      "label": "OCE — Team 2 Wins",
-      "propPath": "oceTeam2.wins",
+      "label": "SA — Team 2 Wins",
+      "propPath": "saTeam2.wins",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam2Losses",
+      "id": "saTeam2Losses",
       "type": "text",
-      "label": "OCE — Team 2 Losses",
-      "propPath": "oceTeam2.losses",
+      "label": "SA — Team 2 Losses",
+      "propPath": "saTeam2.losses",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam2Ties",
+      "id": "saTeam2Ties",
       "type": "text",
-      "label": "OCE — Team 2 Ties",
-      "propPath": "oceTeam2.ties",
+      "label": "SA — Team 2 Ties",
+      "propPath": "saTeam2.ties",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam2Points",
+      "id": "saTeam2Points",
       "type": "text",
-      "label": "OCE — Team 2 Points",
-      "propPath": "oceTeam2.points",
+      "label": "SA — Team 2 Points",
+      "propPath": "saTeam2.points",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam3Name",
+      "id": "saTeam3Name",
       "type": "nameSelect",
-      "folder": "logos/Standings/OCE",
-      "label": "OCE — Team 3 Name",
-      "propPath": "oceTeam3.teamName",
+      "folder": "logos/Standings/SA",
+      "label": "SA — Team 3 Name",
+      "propPath": "saTeam3.teamName",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam3Wins",
+      "id": "saTeam3Wins",
       "type": "text",
-      "label": "OCE — Team 3 Wins",
-      "propPath": "oceTeam3.wins",
+      "label": "SA — Team 3 Wins",
+      "propPath": "saTeam3.wins",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam3Losses",
+      "id": "saTeam3Losses",
       "type": "text",
-      "label": "OCE — Team 3 Losses",
-      "propPath": "oceTeam3.losses",
+      "label": "SA — Team 3 Losses",
+      "propPath": "saTeam3.losses",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam3Ties",
+      "id": "saTeam3Ties",
       "type": "text",
-      "label": "OCE — Team 3 Ties",
-      "propPath": "oceTeam3.ties",
+      "label": "SA — Team 3 Ties",
+      "propPath": "saTeam3.ties",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam3Points",
+      "id": "saTeam3Points",
       "type": "text",
-      "label": "OCE — Team 3 Points",
-      "propPath": "oceTeam3.points",
+      "label": "SA — Team 3 Points",
+      "propPath": "saTeam3.points",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam4Name",
+      "id": "saTeam4Name",
       "type": "nameSelect",
-      "folder": "logos/Standings/OCE",
-      "label": "OCE — Team 4 Name",
-      "propPath": "oceTeam4.teamName",
+      "folder": "logos/Standings/SA",
+      "label": "SA — Team 4 Name",
+      "propPath": "saTeam4.teamName",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam4Wins",
+      "id": "saTeam4Wins",
       "type": "text",
-      "label": "OCE — Team 4 Wins",
-      "propPath": "oceTeam4.wins",
+      "label": "SA — Team 4 Wins",
+      "propPath": "saTeam4.wins",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam4Losses",
+      "id": "saTeam4Losses",
       "type": "text",
-      "label": "OCE — Team 4 Losses",
-      "propPath": "oceTeam4.losses",
+      "label": "SA — Team 4 Losses",
+      "propPath": "saTeam4.losses",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam4Ties",
+      "id": "saTeam4Ties",
       "type": "text",
-      "label": "OCE — Team 4 Ties",
-      "propPath": "oceTeam4.ties",
+      "label": "SA — Team 4 Ties",
+      "propPath": "saTeam4.ties",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     },
     {
-      "id": "oceTeam4Points",
+      "id": "saTeam4Points",
       "type": "text",
-      "label": "OCE — Team 4 Points",
-      "propPath": "oceTeam4.points",
+      "label": "SA — Team 4 Points",
+      "propPath": "saTeam4.points",
       "placeholder": "0",
       "bracketVariant": "scoreboard",
-      "scoreboardBoard": "OCE"
+      "scoreboardBoard": "SA"
     }
   ]
 }
